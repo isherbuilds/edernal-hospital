@@ -11,8 +11,8 @@
   },
   "scripts": {
     "db": "pnpm dotenvx run -f ../env/.env -- drizzle-kit",
-    "db:dev:start": "docker compose -f docker-compose.dev.yaml up -d",
-    "db:dev:stop": "docker compose -f docker-compose.dev.yaml stop",
+    "db:dev:start": "pnpm dotenvx run -f ../env/.env -- sh -c 'docker compose -p \"${DB_DEV_PROJECT_NAME:-$(basename \"$(git rev-parse --show-toplevel)\")-db-dev}\" -f docker-compose.dev.yaml up -d'",
+    "db:dev:stop": "pnpm dotenvx run -f ../env/.env -- sh -c 'docker compose -p \"${DB_DEV_PROJECT_NAME:-$(basename \"$(git rev-parse --show-toplevel)\")-db-dev}\" -f docker-compose.dev.yaml stop'",
     "auth:generate": "vp run -w auth:generate"
   },
   "dependencies": {
