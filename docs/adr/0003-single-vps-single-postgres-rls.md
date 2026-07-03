@@ -7,7 +7,7 @@ The two prior deployment drafts conflicted (logical isolation on shared infra vs
 ## Why
 
 - One person operates this system. Every additional environment, database, and pipeline is a tax on the only engineer. Coolify + docker-compose already exists in the repo and is the cheapest thing that works.
-- RLS + `tenant_id` from day one costs little now and preserves the shared-SaaS economics later; retrofitting tenancy is the expensive path. The schema pack's `002_rls_context.sql`/`003_rls_policies.sql` pattern (session GUCs + forced tenant policies) is adopted, simplified.
+- RLS + `tenant_id` from day one costs little now and preserves the shared-SaaS economics later; retrofitting tenancy is the expensive path. The `002_rls_context.sql`/`003_rls_policies.sql` pattern (session GUCs + forced tenant policies, preserved in the [schema menu](../reference/schema-menu.md)) is adopted, simplified.
 - The pilot has exactly one tenant, so isolation risk is theoretical until hospital #2 — but the tests that prove cross-tenant denial run in CI from the start, against two synthetic tenants.
 
 ## Consequences

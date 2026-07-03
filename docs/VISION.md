@@ -1,6 +1,7 @@
-# PRD: AI-Native Hospital Management System (working name: "Arogya OS")
+# Vision — AI-Native Hospital Management System
 
-**Version:** 1.0 draft · **Date:** July 2, 2026 · **Status:** For review  
+**Layer:** long-term vision (PRD v1, July 2, 2026 — "Arogya OS" below is a placeholder; product name undecided). The plan is to build _all_ of this, eventually. Where it conflicts with the execution layer ([PILOT-SCOPE.md](./PILOT-SCOPE.md), [ROADMAP.md](./ROADMAP.md), [adr/](./adr/)), the execution layer wins — known deviations: solo founder + AI agents (not 3 pods), workflow-first pilot (the scribe is roadmap Phase 6, not Phase 0), and the pilot roadmap replaces §10's M1–M18 phasing until real usage validates it.
+
 **Strategy:** Dual-track — India wedge, globally-portable architecture  
 **Segment:** Mid-size hospitals (50–200 beds), multi-specialty  
 **V1 scope:** Wedge module — OPD + Billing + AI-native EMR. Full suite phased.
@@ -11,7 +12,7 @@
 
 Mid-size hospitals (50–200 beds) run on software built 15–25 years ago — or on paper. India has 40,000+ private hospitals overall; the 50–200 bed slice (thousands of facilities — exact count is an open question for GTM sizing) juggles fragmented tools: a legacy HIMS for billing, paper case sheets, WhatsApp for internal coordination, and Excel for reporting. Doctors spend 30–40% of their time on documentation instead of patients; owners cannot see real-time revenue leakage (unbilled services, insurance claim rejections, pharmacy pilferage); and none of it is ready for ABDM/NHCX compliance that the government is now actively pushing on AB-PMJAY empanelled hospitals.
 
-Globally the picture is structurally identical: Epic and Oracle Health serve large systems at costs mid-size hospitals cannot afford, while the mid-market runs on aging Meditech installs or point solutions. The current AI wave (Abridge, Commure, ambient scribes — a segment that grew 2.4x to ~$600M revenue in 2025) is being bolted *onto* legacy EHRs rather than built *into* one. No one has shipped an AI-native system of record for the mid-size hospital. The cost of not solving this: hospitals lose 5–15% of revenue to leakage, clinicians burn out on data entry, and incumbents lock the market with 10-year contracts as digitization mandates arrive.
+Globally the picture is structurally identical: Epic and Oracle Health serve large systems at costs mid-size hospitals cannot afford, while the mid-market runs on aging Meditech installs or point solutions. The current AI wave (Abridge, Commure, ambient scribes — a segment that grew 2.4x to ~$600M revenue in 2025) is being bolted _onto_ legacy EHRs rather than built _into_ one. No one has shipped an AI-native system of record for the mid-size hospital. The cost of not solving this: hospitals lose 5–15% of revenue to leakage, clinicians burn out on data entry, and incumbents lock the market with 10-year contracts as digitization mandates arrive.
 
 ## 2. Product Thesis
 
@@ -24,18 +25,18 @@ Build the system of record AI-first, not AI-added:
 
 ## 3. Goals
 
-| # | Goal | Target |
-|---|------|--------|
-| G1 | Prove clinical AI value: reduce doctor documentation time per OPD encounter | ≥50% reduction vs. baseline (measured via time-in-note) within 60 days of go-live |
-| G2 | Prove financial value: reduce revenue leakage (unbilled services + claim rejections) | ≥30% reduction in first-pass claim rejection rate; ≥2% revenue recovery within 90 days |
-| G3 | Land the India wedge | 25 paying hospitals live within 12 months of GA; NPS ≥ 50 among doctors |
-| G4 | Compliance as moat | ABDM Milestone 1–3 (AND) certification + WASA audit passed before GA; NHCX claims integration in v1.1 |
-| G5 | Global portability proven | Core data model passes FHIR R4 US Core validation; one non-India pilot (SEA/MEA) by month 18 |
+| #   | Goal                                                                                 | Target                                                                                                |
+| --- | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| G1  | Prove clinical AI value: reduce doctor documentation time per OPD encounter          | ≥50% reduction vs. baseline (measured via time-in-note) within 60 days of go-live                     |
+| G2  | Prove financial value: reduce revenue leakage (unbilled services + claim rejections) | ≥30% reduction in first-pass claim rejection rate; ≥2% revenue recovery within 90 days                |
+| G3  | Land the India wedge                                                                 | 25 paying hospitals live within 12 months of GA; NPS ≥ 50 among doctors                               |
+| G4  | Compliance as moat                                                                   | ABDM Milestone 1–3 (AND) certification + WASA audit passed before GA; NHCX claims integration in v1.1 |
+| G5  | Global portability proven                                                            | Core data model passes FHIR R4 US Core validation; one non-India pilot (SEA/MEA) by month 18          |
 
 ## 4. Non-Goals (v1)
 
 - **IPD/inpatient management** (ward, nursing, OT, ICU) — Phase 2. The OPD wedge must win on its own; IPD triples surface area and implementation time.
-- **Pharmacy & inventory, LIS/RIS** — Phase 2/3. V1 *integrates* with existing lab/pharmacy systems via HL7/FHIR rather than replacing them; replacement is premature.
+- **Pharmacy & inventory, LIS/RIS** — Phase 2/3. V1 _integrates_ with existing lab/pharmacy systems via HL7/FHIR rather than replacing them; replacement is premature.
 - **Telemedicine / patient video consults** — commoditized, low differentiation; integrate a partner if pulled by customers.
 - **US market entry in v1** — HIPAA-ready architecture yes, ONC certification and US GTM no. That is a separate, expensive initiative; sequencing it now would starve the India wedge.
 - **Small clinics (<20 beds) and large chains (500+ beds)** — different buying motion, different product. Design nothing that precludes them, build nothing specifically for them.
@@ -63,7 +64,7 @@ Build the system of record AI-first, not AI-added:
 - As a **physician**, I want the system to listen to my consultation (Hindi/English/code-switched + top regional languages) and draft a structured SOAP note, prescription, and orders, so I sign in 30 seconds instead of typing for 5 minutes.
 - As a **physician**, I want the AI draft to show its confidence and source snippets, so I can trust-but-verify quickly.
 - As a **physician**, I want one-tap access to the patient's longitudinal history (prior visits, labs trended, meds, allergies, uploaded outside records auto-OCR'd), so I stop asking patients to repeat themselves.
-- As a **physician**, I want drug-interaction and allergy alerts at prescribing time that are *rare and relevant*, so I don't develop alert fatigue.
+- As a **physician**, I want drug-interaction and allergy alerts at prescribing time that are _rare and relevant_, so I don't develop alert fatigue.
 - As a **physician**, when transcription fails (noise, no consent, network), I want fast structured templates and voice dictation as fallback, so my worst-case is no worse than today.
 
 ### Billing & revenue integrity
@@ -183,26 +184,26 @@ Build the system of record AI-first, not AI-added:
 
 **Blocking (answer before build)**
 
-1. **Clinical AI liability & consent** — exact consent language, audio retention policy, and medico-legal review of AI-drafted notes under Indian law (IMC/NMC guidelines, DPDP). → *Legal + clinical advisor.*
-2. **Scribe build vs. license** — build STT+LLM pipeline on foundation models vs. license an Indian-language medical STT layer; accuracy bar for Hinglish clinical speech must be validated with real consult audio before committing. → *Engineering/AI lead; run a 4-week bake-off.*
-3. **ABDM certification path & timeline** — confirm current milestone requirements, WASA vendor, and realistic certification lead time so GA date is credible. → *Compliance lead with NHA sandbox.*
+1. **Clinical AI liability & consent** — exact consent language, audio retention policy, and medico-legal review of AI-drafted notes under Indian law (IMC/NMC guidelines, DPDP). → _Legal + clinical advisor._
+2. **Scribe build vs. license** — build STT+LLM pipeline on foundation models vs. license an Indian-language medical STT layer; accuracy bar for Hinglish clinical speech must be validated with real consult audio before committing. → _Engineering/AI lead; run a 4-week bake-off._
+3. **ABDM certification path & timeline** — confirm current milestone requirements, WASA vendor, and realistic certification lead time so GA date is credible. → _Compliance lead with NHA sandbox._
 
 **Non-blocking (resolve during build)**
 
-4. NHCX payer readiness: which insurers/TPAs accept NHCX claims today vs. portal-only? Determines v1.1 scope. → *Partnerships.*
-5. Pricing architecture: per-bed vs. per-doctor vs. per-encounter; AI usage metering (scribe minutes) bundled or metered? → *Founders/GTM, validate in first 10 sales.*
-6. Hardware baseline: do we ship/certify recommended tablets+mics for consultation rooms, or stay BYOD? Scribe accuracy depends on audio quality. → *Product + field pilots.*
-7. Which two launch states/cities? (Density of 50–200 bed hospitals, TPA mix, language: NCR + Hyderabad are candidates.) → *GTM.*
-8. Anchor design partners: 3–5 hospitals co-developing from month 1 — selection criteria and commercial terms. → *Founders.*
+4. NHCX payer readiness: which insurers/TPAs accept NHCX claims today vs. portal-only? Determines v1.1 scope. → _Partnerships._
+5. Pricing architecture: per-bed vs. per-doctor vs. per-encounter; AI usage metering (scribe minutes) bundled or metered? → _Founders/GTM, validate in first 10 sales._
+6. Hardware baseline: do we ship/certify recommended tablets+mics for consultation rooms, or stay BYOD? Scribe accuracy depends on audio quality. → _Product + field pilots._
+7. Which two launch states/cities? (Density of 50–200 bed hospitals, TPA mix, language: NCR + Hyderabad are candidates.) → _GTM._
+8. Anchor design partners: 3–5 hospitals co-developing from month 1 — selection criteria and commercial terms. → _Founders._
 
 ## 10. Timeline & Phasing
 
-| Phase | Window | Scope | Exit criteria |
-|---|---|---|---|
-| **0 — Foundations** | M1–M3 | FHIR core, auth/RBAC, registration, scheduling; scribe bake-off with real consult audio; 3–5 design partners signed | Scribe accuracy bar met on Hinglish OPD audio; ABDM sandbox integration working |
-| **1 — Private beta** | M4–M7 | Full P0 set live at design partners; ABDM M1–M2; WASA audit started | 5 hospitals live; G1 metric (≥50% doc-time reduction) hit at ≥3 sites |
-| **2 — GA (India wedge)** | M8–M12 | Hardening, migration tooling, AND certification, 2-city GTM launch; v1.1 NHCX + owner analytics | 25 paying hospitals; retention and NPS targets tracking |
-| **3 — Expand** | M13–M18 | IPD suite build (Phase-2 flagship); pharmacy/LIS integrations; first non-India pilot via config pack | IPD beta at 3 sites; 1 international pilot live |
+| Phase                    | Window  | Scope                                                                                                               | Exit criteria                                                                   |
+| ------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| **0 — Foundations**      | M1–M3   | FHIR core, auth/RBAC, registration, scheduling; scribe bake-off with real consult audio; 3–5 design partners signed | Scribe accuracy bar met on Hinglish OPD audio; ABDM sandbox integration working |
+| **1 — Private beta**     | M4–M7   | Full P0 set live at design partners; ABDM M1–M2; WASA audit started                                                 | 5 hospitals live; G1 metric (≥50% doc-time reduction) hit at ≥3 sites           |
+| **2 — GA (India wedge)** | M8–M12  | Hardening, migration tooling, AND certification, 2-city GTM launch; v1.1 NHCX + owner analytics                     | 25 paying hospitals; retention and NPS targets tracking                         |
+| **3 — Expand**           | M13–M18 | IPD suite build (Phase-2 flagship); pharmacy/LIS integrations; first non-India pilot via config pack                | IPD beta at 3 sites; 1 international pilot live                                 |
 
 **Dependencies & hard dates**: ABDM/NHCX government timelines (external, monitor monthly); WASA/AND certification lead times gate GA; scribe language expansion gates non-Hindi-belt geography.
 
@@ -212,14 +213,14 @@ Build the system of record AI-first, not AI-added:
 
 ## Appendix A — Competitive frame (summary)
 
-| | Incumbent India HIMS (KareXpert, Insta, Attune, MocDoc, Birlamedisoft) | Global enterprise (Epic, Oracle Health) | AI point solutions (Abridge, Commure, Suki) | **Us** |
-|---|---|---|---|---|
-| AI posture | Bolted-on features | Bolt-on via partners | AI-first but not system-of-record | AI-native system of record |
-| Mid-size fit | Yes, but legacy UX, weak AI | Unaffordable | Complement, not replacement | Purpose-built |
-| ABDM/FHIR | Retrofit | N/A India | N/A | Native |
-| Wedge risk to us | Price war, install base | None near-term | Could expand downward into EHR (Commure trajectory — watch) | — |
+|                  | Incumbent India HIMS (KareXpert, Insta, Attune, MocDoc, Birlamedisoft) | Global enterprise (Epic, Oracle Health) | AI point solutions (Abridge, Commure, Suki)                 | **Us**                     |
+| ---------------- | ---------------------------------------------------------------------- | --------------------------------------- | ----------------------------------------------------------- | -------------------------- |
+| AI posture       | Bolted-on features                                                     | Bolt-on via partners                    | AI-first but not system-of-record                           | AI-native system of record |
+| Mid-size fit     | Yes, but legacy UX, weak AI                                            | Unaffordable                            | Complement, not replacement                                 | Purpose-built              |
+| ABDM/FHIR        | Retrofit                                                               | N/A India                               | N/A                                                         | Native                     |
+| Wedge risk to us | Price war, install base                                                | None near-term                          | Could expand downward into EHR (Commure trajectory — watch) | —                          |
 
-Positioning sentence: *"The AI-native hospital OS for India's mid-size hospitals — doctors talk, the system does the paperwork, and owners stop losing revenue they never knew they were losing."*
+Positioning sentence: _"The AI-native hospital OS for India's mid-size hospitals — doctors talk, the system does the paperwork, and owners stop losing revenue they never knew they were losing."_
 
 ## Appendix B — Assumptions register
 

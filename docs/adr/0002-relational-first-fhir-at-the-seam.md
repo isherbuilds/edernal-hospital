@@ -17,7 +17,7 @@ Baseline ADR-1 and the Arogya schema pack proposed a FHIR-R4 JSONB canonical sto
 
 ## Consequences
 
-- The 125-table schema pack is a **reference menu, not an adoption target**. Tables are pulled in (and usually simplified) per roadmap phase; `fhir.ts` is not adopted.
+- The 125-table schema pack (distilled into the [schema menu](../reference/schema-menu.md)) is a **reference menu, not an adoption target**. Tables are pulled in (and usually simplified) per roadmap phase; `fhir.ts` is not adopted.
 - When ABDM work starts, we build `domain table → FHIR bundle` mappers and validate outbound bundles only. Clinical data never migrates — only a mapping layer is added.
 - Keep discipline now: store codes (not just labels) for diagnoses/meds where it's cheap, keep an identifier table on Patient with a system/value shape, keep Encounter as the anchor entity (generic enough for future IPD/ER, per the PRD's P2 insurance).
 - **Re-open trigger:** the ABDM integration phase, the first external FHIR consumer, or evidence that the mapping layer is rotting (export drift vs domain tables). ADR-1's long-term argument (one honest source of truth for multi-geography interop) stays on file — it lost on timing, not on merit.
