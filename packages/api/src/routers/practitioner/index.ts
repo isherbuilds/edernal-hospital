@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { STAFF_ROLES } from "@tsu-stack/core/auth";
+import { STAFF_ROLE, STAFF_ROLES } from "@tsu-stack/core/auth";
 
 import { tenantProcedure } from "#@/lib/procedures/factory";
 import { TenantScopeInputSchema } from "#@/lib/tenancy/scope";
@@ -25,7 +25,7 @@ export const practitionerRouter = {
     .handler(({ context, input }) =>
       withTenantTx(context, "practitioner.byId", (scope) => getPractitionerById(scope, input.id))
     ),
-  create: tenantProcedure(PractitionerCreateInputSchema, ["hospital_admin"])
+  create: tenantProcedure(PractitionerCreateInputSchema, [STAFF_ROLE.HOSPITAL_ADMIN])
     .route({
       description: "Create a Practitioner in the requested Tenant",
       method: "POST"

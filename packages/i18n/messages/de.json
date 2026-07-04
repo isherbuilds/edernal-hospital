@@ -27,7 +27,7 @@
   "playground_page__visit_error_page": "Langsame Fehlerseite besuchen",
   "playground_page__visit_not_found_page": "Nicht gefunden Seite besuchen",
   "dashboard_page__title": "Dashboard für",
-  "dashboard_page__protected_rpc_route": "Geschützte RPC-Route",
+  "dashboard_page__public_health_check": "Öffentlicher Gesundheitscheck",
   "dashboard_page__checking": "Überprüfung...",
   "dashboard_page__successfully_fetched": "Erfolgreich abgerufen",
   "dashboard_page__failed_to_fetch": "Abruf fehlgeschlagen",

@@ -27,7 +27,7 @@
   "playground_page__visit_error_page": "Visit Slow Loading Error Page",
   "playground_page__visit_not_found_page": "Visit Not Found Page",
   "dashboard_page__title": "Dashboard for",
-  "dashboard_page__protected_rpc_route": "Protected RPC Route",
+  "dashboard_page__public_health_check": "Public Health Check",
   "dashboard_page__checking": "Checking...",
   "dashboard_page__successfully_fetched": "Successfully fetched",
   "dashboard_page__failed_to_fetch": "Failed to fetch",

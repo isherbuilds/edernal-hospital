@@ -33,7 +33,10 @@ export const session = pgTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" })
   },
-  (table) => [index("session_userId_idx").on(table.userId)]
+  (table) => [
+    index("session_activeOrganizationId_idx").on(table.activeOrganizationId),
+    index("session_userId_idx").on(table.userId)
+  ]
 );
 
 export const account = pgTable(
@@ -76,21 +79,17 @@ export const verification = pgTable(
   (table) => [index("verification_identifier_idx").on(table.identifier)]
 );
 
-export const organization = pgTable(
-  "organization",
-  {
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    defaultTimezone: text("default_timezone").default("Asia/Kolkata"),
-    displayName: text("display_name"),
-    id: text("id").primaryKey(),
-    legalName: text("legal_name"),
-    logo: text("logo"),
-    metadata: text("metadata"),
-    name: text("name").notNull(),
-    slug: text("slug").notNull().unique()
-  },
-  (table) => [index("organization_slug_idx").on(table.slug)]
-);
+export const organization = pgTable("organization", {
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  defaultTimezone: text("default_timezone").default("Asia/Kolkata"),
+  displayName: text("display_name"),
+  id: text("id").primaryKey(),
+  legalName: text("legal_name"),
+  logo: text("logo"),
+  metadata: text("metadata"),
+  name: text("name").notNull(),
+  slug: text("slug").notNull().unique()
+});
 
 export const member = pgTable(
   "member",
@@ -109,7 +108,6 @@ export const member = pgTable(
       .references(() => user.id, { onDelete: "cascade" })
   },
   (table) => [
-    index("member_organizationId_idx").on(table.organizationId),
     index("member_userId_idx").on(table.userId),
     uniqueIndex("member_organizationId_userId_unique").on(table.organizationId, table.userId)
   ]
@@ -133,6 +131,7 @@ export const invitation = pgTable(
   },
   (table) => [
     index("invitation_email_idx").on(table.email),
+    index("invitation_inviterId_idx").on(table.inviterId),
     index("invitation_organizationId_idx").on(table.organizationId)
   ]
 );

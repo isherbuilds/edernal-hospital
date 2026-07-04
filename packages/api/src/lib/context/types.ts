@@ -13,6 +13,7 @@ export type TenantContext = {
 export type OrpcContext = {
   session: AuthSession | null;
   logger: RequestLogger;
+  requestId?: string;
   tenant?: TenantContext;
 };
 

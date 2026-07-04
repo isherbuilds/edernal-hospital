@@ -40,7 +40,7 @@ function RouteComponent() {
         {m.dashboard_page__title()} {user.name}
       </h2>
       <section>
-        <h2 className="font-display my-8 text-2xl">{m.dashboard_page__protected_rpc_route()}</h2>
+        <h2 className="font-display my-8 text-2xl">{m.dashboard_page__public_health_check()}</h2>
         <div className="rounded-lg border p-4">
           <div className="mb-4 flex items-center gap-2">
             <div

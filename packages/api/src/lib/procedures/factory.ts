@@ -79,6 +79,7 @@ function requireTenantRole(requiredRoles: readonly StaffRole[]) {
 
     const nextContext = {
       logger: context.logger,
+      requestId: context.requestId,
       session: context.session,
       tenant: {
         id: access.profile.id,

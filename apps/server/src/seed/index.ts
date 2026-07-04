@@ -13,8 +13,6 @@ import {
 } from "@tsu-stack/db/schema";
 import { ENV_SERVER } from "@tsu-stack/env/server/env";
 
-const SEED_PASSWORD = "EdernalDev#2026";
-
 type SeedOrganization = {
   displayName: string;
   legalName: string;
@@ -170,7 +168,7 @@ const SEED_TENANTS: SeedTenant[] = [
   }
 ];
 
-async function ensureUser(input: SeedStaffUser) {
+async function ensureUser(input: SeedStaffUser, seedPassword: string) {
   const [existing] = await db
     .select()
     .from(authUser)
@@ -184,7 +182,7 @@ async function ensureUser(input: SeedStaffUser) {
     body: {
       email: input.email,
       name: input.name,
-      password: SEED_PASSWORD
+      password: seedPassword
     }
   });
 
@@ -211,16 +209,17 @@ async function ensureOrganization(seed: SeedTenant) {
   }
 
   const id = randomUUID();
-  await db.insert(organization).values({
-    defaultTimezone: seed.facility.timezone,
-    displayName: seed.organization.displayName,
-    id,
-    legalName: seed.organization.legalName,
-    name: seed.organization.name,
-    slug: seed.organization.slug
-  });
-
-  const [created] = await db.select().from(organization).where(eq(organization.id, id)).limit(1);
+  const [created] = await db
+    .insert(organization)
+    .values({
+      defaultTimezone: seed.facility.timezone,
+      displayName: seed.organization.displayName,
+      id,
+      legalName: seed.organization.legalName,
+      name: seed.organization.name,
+      slug: seed.organization.slug
+    })
+    .returning();
   if (!created) {
     throw new Error(`Failed to create seed organization ${seed.organization.slug}`);
   }
@@ -339,6 +338,10 @@ async function main() {
     throw new Error("Refusing to run seed against production without ALLOW_PRODUCTION_SEED=true");
   }
 
+  if (!ENV_SERVER.SEED_PASSWORD) {
+    throw new Error("SEED_PASSWORD is required to create seed Staff User accounts.");
+  }
+
   let seededStaffCount = 0;
 
   for (const seed of SEED_TENANTS) {
@@ -346,7 +349,7 @@ async function main() {
     await ensureFacility(organizationRow.id, seed);
 
     for (const staff of seed.staffUsers) {
-      const userRow = await ensureUser(staff);
+      const userRow = await ensureUser(staff, ENV_SERVER.SEED_PASSWORD);
       await ensureMember({
         employeeCode: staff.employeeCode,
         organizationId: organizationRow.id,
@@ -369,7 +372,7 @@ async function main() {
 
   process.stdout.write(
     `Seeded ${SEED_TENANTS.length} Tenants with ${seededStaffCount} staff users. ` +
-      `Seed password: ${SEED_PASSWORD}. ` +
+      "Seed password source: SEED_PASSWORD environment variable. " +
       `Hospital admin users: ${adminEmails}.\n`
   );
 }

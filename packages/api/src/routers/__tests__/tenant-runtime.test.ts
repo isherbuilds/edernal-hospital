@@ -28,6 +28,7 @@ type TenantFixture = {
   facilityId: string;
   organizationId: string;
   practitionerId: string;
+  practitionerRegistrationNumber: string;
   userId: string;
 };
 
@@ -71,17 +72,20 @@ async function cleanup() {
 }
 
 async function deleteAuditEventsForOrganizations(organizationIds: string[]) {
-  await db.execute(
-    sql`ALTER TABLE "audit_events" DISABLE TRIGGER "audit_events_prevent_update_delete"`
-  );
-
-  try {
-    await db.delete(auditEvents).where(inArray(auditEvents.tenantId, organizationIds));
-  } finally {
-    await db.execute(
-      sql`ALTER TABLE "audit_events" ENABLE TRIGGER "audit_events_prevent_update_delete"`
+  await db.transaction(async (tx) => {
+    await tx.execute(sql`SELECT pg_advisory_xact_lock(1783186182780)`);
+    await tx.execute(
+      sql`ALTER TABLE "audit_events" DISABLE TRIGGER "audit_events_prevent_update_delete"`
     );
-  }
+
+    try {
+      await tx.delete(auditEvents).where(inArray(auditEvents.tenantId, organizationIds));
+    } finally {
+      await tx.execute(
+        sql`ALTER TABLE "audit_events" ENABLE TRIGGER "audit_events_prevent_update_delete"`
+      );
+    }
+  });
 }
 
 afterEach(async () => {
@@ -157,6 +161,7 @@ async function createTenantFixture(input: {
     facilityId: facility.id,
     organizationId,
     practitionerId: practitioner.id,
+    practitionerRegistrationNumber: suffix,
     userId
   };
   remember(fixture);
@@ -248,6 +253,7 @@ describeWithDb("tenant runtime access", () => {
 
     expect(result).toHaveLength(1);
     expect(result[0]?.id).toBe(fixture.facilityId);
+    expect(result[0]).not.toHaveProperty("gstin");
   });
 
   it("denies create access to non-admin staff", async () => {
@@ -286,6 +292,7 @@ describeWithDb("tenant runtime access", () => {
     );
 
     expect(result.code).toBe("MULTI");
+    expect(result).toHaveProperty("gstin");
   });
 
   it("rejects unknown Better Auth member role strings", async () => {
@@ -477,6 +484,42 @@ describeWithDb("tenant runtime access", () => {
           tenantId: fixture.organizationId
         })
       ])
+    );
+  });
+
+  it("maps duplicate Facility codes and Practitioner registrations to conflicts", async () => {
+    expect.assertions(2);
+    const fixture = await createTenantFixture({ role: "hospital_admin" });
+
+    await expectOrpcCode(
+      call(
+        facilityRouter.create,
+        {
+          code: "MAIN",
+          name: "Duplicate Main",
+          tenantId: fixture.organizationId
+        },
+        {
+          context: contextFor(fixture)
+        }
+      ),
+      "CONFLICT"
+    );
+
+    await expectOrpcCode(
+      call(
+        practitionerRouter.create,
+        {
+          displayName: "Duplicate Practitioner",
+          registrationCouncil: "NMC",
+          registrationNumber: fixture.practitionerRegistrationNumber,
+          tenantId: fixture.organizationId
+        },
+        {
+          context: contextFor(fixture)
+        }
+      ),
+      "CONFLICT"
     );
   });
 });

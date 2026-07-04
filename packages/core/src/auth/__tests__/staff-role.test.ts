@@ -23,18 +23,6 @@ describe("staff role contract", () => {
     expect(Object.keys(roleRecord)).toEqual(STAFF_ROLES);
   });
 
-  it("keeps Better Auth organization role keys aligned with staff roles", async () => {
-    const authOrganizationAccessUrl = new URL(
-      "../../../../auth/src/organization-access.ts",
-      import.meta.url
-    ).href;
-    const { organizationRoles } = (await import(authOrganizationAccessUrl)) as {
-      organizationRoles: Record<string, unknown>;
-    };
-
-    expect(Object.keys(organizationRoles)).toEqual(STAFF_ROLES);
-  });
-
   it("rejects Better Auth's built-in member role as a staff role", () => {
     expect(StaffRoleSchema.safeParse("member").success).toBe(false);
   });

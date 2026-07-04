@@ -24,6 +24,7 @@ export function withTenantTx<T>(
           action: record.action,
           actorUserId: context.session.user.id,
           details: record.details,
+          requestId: record.requestId ?? context.requestId,
           resourceId: record.resourceId,
           resourceType: record.resourceType,
           tenantId: context.tenant.id

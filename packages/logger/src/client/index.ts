@@ -14,6 +14,7 @@ type ClientLoggerConfig = {
 
 type LogMethod = typeof evlogLog.info;
 type LogMethodName = "debug" | "error" | "info" | "warn";
+type RuntimeLogMethod = (tagOrEvent: string | Record<string, unknown>, message?: string) => void;
 
 const DEFAULT_CLIENT_LOGGER_CONFIG = {
   service: LOG_SERVICES.DEFAULT
@@ -153,6 +154,7 @@ function withIdentity(methodName: LogMethodName): LogMethod {
     }
 
     if (message === undefined) {
+      (evlogLog[methodName] as RuntimeLogMethod)(tagOrEvent);
       return;
     }
 

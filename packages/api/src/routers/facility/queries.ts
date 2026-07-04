@@ -1,3 +1,4 @@
+import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 
 import { and, asc, eq } from "@tsu-stack/db";
@@ -46,6 +47,9 @@ export const FacilityOutputSchema = z.object({
 });
 
 export type FacilityOutput = z.infer<typeof FacilityOutputSchema>;
+export const FacilityCreateOutputSchema = FacilityOutputSchema;
+export const FacilityStaffOutputSchema = FacilityOutputSchema.omit({ gstin: true });
+export type FacilityStaffOutput = z.infer<typeof FacilityStaffOutputSchema>;
 
 type FacilityRow = typeof facilities.$inferSelect;
 
@@ -63,6 +67,23 @@ function toFacilityOutput(row: FacilityRow): FacilityOutput {
   };
 }
 
+function toFacilityStaffOutput(row: FacilityRow): FacilityStaffOutput {
+  return FacilityStaffOutputSchema.parse(toFacilityOutput(row));
+}
+
+function isUniqueConstraintError(error: unknown, constraintName: string) {
+  if (!error || typeof error !== "object") {
+    return false;
+  }
+
+  return (
+    "code" in error &&
+    "constraint_name" in error &&
+    error.code === "23505" &&
+    error.constraint_name === constraintName
+  );
+}
+
 export async function createFacility(
   { audit, tenantId, tx }: TenantTxScope,
   input: FacilityCreateInput
@@ -77,7 +98,17 @@ export async function createFacility(
       tenantId,
       timezone: input.timezone
     })
-    .returning();
+    .returning()
+    .catch((error: unknown) => {
+      if (isUniqueConstraintError(error, "facilities_tenant_id_code_unique")) {
+        throw new ORPCError("CONFLICT", {
+          message: "Facility code already exists for this Tenant.",
+          status: 409
+        });
+      }
+
+      throw error;
+    });
 
   if (!facility) {
     throw new Error("Failed to create Facility");
@@ -107,7 +138,7 @@ export async function listFacilities({ audit, tenantId, tx }: TenantTxScope) {
     resultCount: rows.length
   });
 
-  return rows.map(toFacilityOutput);
+  return rows.map(toFacilityStaffOutput);
 }
 
 export async function getFacilityById({ audit, tenantId, tx }: TenantTxScope, id: string) {
@@ -123,5 +154,5 @@ export async function getFacilityById({ audit, tenantId, tx }: TenantTxScope, id
     resultCount: facility ? 1 : 0
   });
 
-  return facility ? toFacilityOutput(facility) : null;
+  return facility ? toFacilityStaffOutput(facility) : null;
 }

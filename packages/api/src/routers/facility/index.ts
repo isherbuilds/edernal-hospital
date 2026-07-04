@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { STAFF_ROLES } from "@tsu-stack/core/auth";
+import { STAFF_ROLE, STAFF_ROLES } from "@tsu-stack/core/auth";
 
 import { tenantProcedure } from "#@/lib/procedures/factory";
 import { TenantScopeInputSchema } from "#@/lib/tenancy/scope";
@@ -10,7 +10,8 @@ import {
   createFacility,
   FacilityByIdInputSchema,
   FacilityCreateInputSchema,
-  FacilityOutputSchema,
+  FacilityCreateOutputSchema,
+  FacilityStaffOutputSchema,
   getFacilityById,
   listFacilities
 } from "./queries";
@@ -21,16 +22,16 @@ export const facilityRouter = {
       description: "Get a Facility by ID in the requested Tenant",
       method: "GET"
     })
-    .output(FacilityOutputSchema.nullable())
+    .output(FacilityStaffOutputSchema.nullable())
     .handler(({ context, input }) =>
       withTenantTx(context, "facility.byId", (scope) => getFacilityById(scope, input.id))
     ),
-  create: tenantProcedure(FacilityCreateInputSchema, ["hospital_admin"])
+  create: tenantProcedure(FacilityCreateInputSchema, [STAFF_ROLE.HOSPITAL_ADMIN])
     .route({
       description: "Create a Facility in the requested Tenant",
       method: "POST"
     })
-    .output(FacilityOutputSchema)
+    .output(FacilityCreateOutputSchema)
     .handler(({ context, input }) =>
       withTenantTx(context, "facility.create", (scope) => createFacility(scope, input))
     ),
@@ -39,6 +40,6 @@ export const facilityRouter = {
       description: "List Facilities in the requested Tenant",
       method: "GET"
     })
-    .output(z.array(FacilityOutputSchema))
+    .output(z.array(FacilityStaffOutputSchema))
     .handler(({ context }) => withTenantTx(context, "facility.list", listFacilities))
 };

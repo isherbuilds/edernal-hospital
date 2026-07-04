@@ -1,4 +1,4 @@
-import { createAccessControl } from "better-auth/plugins";
+import { createAccessControl } from "better-auth/plugins/access";
 
 import { STAFF_ROLE, createStaffRoleRecord, type StaffRole } from "@tsu-stack/core/auth";
 

@@ -1,3 +1,4 @@
+import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 
 import { and, asc, eq } from "@tsu-stack/db";
@@ -51,6 +52,19 @@ function toPractitionerOutput(row: PractitionerRow): PractitionerOutput {
   };
 }
 
+function isUniqueConstraintError(error: unknown, constraintName: string) {
+  if (!error || typeof error !== "object") {
+    return false;
+  }
+
+  return (
+    "code" in error &&
+    "constraint_name" in error &&
+    error.code === "23505" &&
+    error.constraint_name === constraintName
+  );
+}
+
 export async function createPractitioner(
   { audit, tenantId, tx }: TenantTxScope,
   input: PractitionerCreateInput
@@ -64,7 +78,17 @@ export async function createPractitioner(
       specialties: input.specialties,
       tenantId
     })
-    .returning();
+    .returning()
+    .catch((error: unknown) => {
+      if (isUniqueConstraintError(error, "practitioners_tenant_id_registration_unique")) {
+        throw new ORPCError("CONFLICT", {
+          message: "Practitioner registration already exists for this Tenant.",
+          status: 409
+        });
+      }
+
+      throw error;
+    });
 
   if (!practitioner) {
     throw new Error("Failed to create Practitioner");

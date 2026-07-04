@@ -1,6 +1,17 @@
-import { jsonb, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import {
+  index,
+  jsonb,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+  uniqueIndex,
+  uuid
+} from "drizzle-orm/pg-core";
 
 import { organization, user } from "#@/schema/auth.schema";
+
+export const tenantResourceStatus = pgEnum("tenant_resource_status", ["active", "inactive"]);
 
 export type FacilityAddress = {
   line1?: string;
@@ -20,7 +31,7 @@ export const facilities = pgTable(
     gstin: text("gstin"),
     id: uuid("id").defaultRandom().primaryKey(),
     name: text("name").notNull(),
-    status: text("status").default("active").notNull(),
+    status: tenantResourceStatus("status").default("active").notNull(),
     tenantId: text("tenant_id")
       .notNull()
       .references(() => organization.id, { onDelete: "restrict" }),
@@ -42,7 +53,7 @@ export const practitioners = pgTable(
     registrationCouncil: text("registration_council").notNull(),
     registrationNumber: text("registration_number").notNull(),
     specialties: jsonb("specialties").$type<string[]>().default([]).notNull(),
-    status: text("status").default("active").notNull(),
+    status: tenantResourceStatus("status").default("active").notNull(),
     tenantId: text("tenant_id")
       .notNull()
       .references(() => organization.id, { onDelete: "restrict" }),
@@ -53,6 +64,7 @@ export const practitioners = pgTable(
     userId: text("user_id").references(() => user.id, { onDelete: "set null" })
   },
   (table) => [
+    index("practitioners_userId_idx").on(table.userId),
     uniqueIndex("practitioners_tenant_id_registration_unique").on(
       table.tenantId,
       table.registrationCouncil,

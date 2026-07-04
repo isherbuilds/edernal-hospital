@@ -61,6 +61,7 @@ app.onError((error, c) => {
   } else {
     log.error({
       code: "HONO_GLOBAL_ERROR",
+      error,
       event: "hono_global_error",
       reason: "request_logger_unavailable"
     });
