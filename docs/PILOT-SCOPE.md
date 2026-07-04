@@ -17,28 +17,28 @@ Three product loops and one trust loop, at one hospital, in real daily operation
 
 ## In scope at go-live
 
-| Area | Scope |
-|---|---|
-| Registration | Name, phone, age/DOB, sex, optional address; phone-based returning-patient lookup; basic duplicate warning (phone+name). |
-| Queue | Per-practitioner Tokens, live Queue board, statuses (waiting / in-consult / done / skipped). |
-| Consult | Encounter screen: vitals, complaints, findings, diagnosis, advice; template or free text; prominent allergy field; Preliminary → Signed state machine. |
-| Prescription | Compose from hospital Formulary or free text; sign; print (clinical-advisor-reviewed layout); immutable once signed, supersede to correct. |
-| Orders | Pharmacy/lab order entry → Work Queue screens → status updates → file attachment for lab reports. **No inventory** ([ADR-0006](./adr/0006-coexistence-pilot-no-inventory.md)). |
-| Billing | Service Catalog with GST rates; auto Charges from Encounter events; Draft Bill → numbered immutable Invoice; cash + manual UPI reference; credit note for corrections; day summary; ordered-not-billed report. |
-| Trust | The eight Trust Envelope controls ([ADR-0004](./adr/0004-pilot-trust-envelope.md)). |
-| Ops | Coolify single-VPS deploy, offsite backups, paper-fallback outage procedure ([ADR-0003](./adr/0003-single-vps-single-postgres-rls.md)). |
+| Area         | Scope                                                                                                                                                                                                          |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Registration | Name, phone, age/DOB, sex, optional address; phone-based returning-patient lookup; basic duplicate warning (phone+name).                                                                                       |
+| Queue        | Per-practitioner Tokens, live Queue board, statuses (waiting / in-consult / done / skipped).                                                                                                                   |
+| Consult      | Encounter screen: vitals, complaints, findings, diagnosis, advice; template or free text; prominent allergy field; Preliminary → Signed state machine.                                                         |
+| Prescription | Compose from hospital Formulary or free text; sign; print (clinical-advisor-reviewed layout); immutable once signed, supersede to correct.                                                                     |
+| Orders       | Pharmacy/lab order entry → Work Queue screens → status updates → file attachment for lab reports. **No inventory** ([ADR-0006](./adr/0006-coexistence-pilot-no-inventory.md)).                                 |
+| Billing      | Service Catalog with GST rates; auto Charges from Encounter events; Draft Bill → numbered immutable Invoice; cash + manual UPI reference; credit note for corrections; day summary; ordered-not-billed report. |
+| Trust        | The eight Trust Envelope controls ([ADR-0004](./adr/0004-pilot-trust-envelope.md)).                                                                                                                            |
+| Ops          | Coolify single-VPS deploy, offsite backups, paper-fallback outage procedure ([ADR-0003](./adr/0003-single-vps-app-tenancy.md)).                                                                                |
 
 ## Explicitly out (and where it went)
 
-| Cut | Why | Returns in |
-|---|---|---|
-| AI scribe (audio, STT, LLM drafts) | Heaviest trust burden, not the hospital's ask ([ADR-0001](./adr/0001-workflow-first-opd-pilot.md)) | Phase 6 |
-| ABDM / ABHA | No pilot consumer; identifier seam kept ([ADR-0005](./adr/0005-defer-abdm-typed-rx-paper-equivalent.md)) | Phase 7 |
-| Drug-interaction / allergy engine | Paper-equivalent safety at pilot ([ADR-0005](./adr/0005-defer-abdm-typed-rx-paper-equivalent.md)) | Phase 7–8 |
-| Pharmacy inventory / stock | Incumbent software keeps it; dual-run ([ADR-0006](./adr/0006-coexistence-pilot-no-inventory.md)) | Post-pilot decision |
-| FHIR-canonical store | Mapping layer later, not storage now ([ADR-0002](./adr/0002-relational-first-fhir-at-the-seam.md)) | With ABDM |
-| IPD, claims/NHCX, payment gateway, WhatsApp delivery, patient app, owner analytics, offline/edge, multi-language, marketplace | Standard cutline — validate loops first | Backlog, post-pilot |
-| Break-glass, purpose-of-use engine, per-tenant KMS, hash-chained audit, support-access UI | Risk Register with mitigations ([ADR-0004](./adr/0004-pilot-trust-envelope.md)) | As tenants/team grow |
+| Cut                                                                                                                           | Why                                                                                                      | Returns in           |
+| ----------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | -------------------- |
+| AI scribe (audio, STT, LLM drafts)                                                                                            | Heaviest trust burden, not the hospital's ask ([ADR-0001](./adr/0001-workflow-first-opd-pilot.md))       | Phase 6              |
+| ABDM / ABHA                                                                                                                   | No pilot consumer; identifier seam kept ([ADR-0005](./adr/0005-defer-abdm-typed-rx-paper-equivalent.md)) | Phase 7              |
+| Drug-interaction / allergy engine                                                                                             | Paper-equivalent safety at pilot ([ADR-0005](./adr/0005-defer-abdm-typed-rx-paper-equivalent.md))        | Phase 7–8            |
+| Pharmacy inventory / stock                                                                                                    | Incumbent software keeps it; dual-run ([ADR-0006](./adr/0006-coexistence-pilot-no-inventory.md))         | Post-pilot decision  |
+| FHIR-canonical store                                                                                                          | Mapping layer later, not storage now ([ADR-0002](./adr/0002-relational-first-fhir-at-the-seam.md))       | With ABDM            |
+| IPD, claims/NHCX, payment gateway, WhatsApp delivery, patient app, owner analytics, offline/edge, multi-language, marketplace | Standard cutline — validate loops first                                                                  | Backlog, post-pilot  |
+| Break-glass, purpose-of-use engine, per-tenant KMS, hash-chained audit, support-access UI                                     | Risk Register with mitigations ([ADR-0004](./adr/0004-pilot-trust-envelope.md))                          | As tenants/team grow |
 
 ## Pilot success metrics
 
@@ -46,7 +46,7 @@ Three product loops and one trust loop, at one hospital, in real daily operation
 - Encounters signed in-system per day per doctor (adoption, not demo).
 - Invoices issued in-system per day; ordered-not-billed count trend.
 - Per-station usage (front desk / doctor / pharmacy / lab / billing) — the dual-run makes silent abandonment the failure mode to watch.
-- Zero cross-tenant/RLS test failures; zero PHI-in-logs findings; restore drill passed.
+- Zero cross-tenant denial test failures; zero PHI-in-logs findings; restore drill passed.
 
 ## Named risks
 

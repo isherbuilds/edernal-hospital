@@ -11,19 +11,19 @@ The repo today is a pristine tsu-stack starter (TanStack Start + Hono + oRPC + D
 
 ## Phase 0 — Foundation & tenancy skeleton (~week 1–2)
 
-**Why first:** every later table and endpoint depends on tenancy, roles, and audit being in the request path. Retrofitting `tenant_id`, RLS, or audit emission across a built app is the classic irreversible mistake the old docs warned about — this is the only "platform" phase, kept deliberately small.
+**Why first:** every later table and endpoint depends on tenancy, roles, and audit being in the request path. Retrofitting `tenant_id`, tenant-scoped query discipline, or audit emission across a built app is the classic irreversible mistake the old docs warned about — this is the only "platform" phase, kept deliberately small.
 
 **Checklist**
 
 - [ ] Enable Better Auth plugins needed for a hospital: `organization` (= Tenant), `admin`, MFA for admin roles; regenerate auth schema into `@tsu-stack/db`.
 - [ ] Core tables in `@tsu-stack/db`: `tenants` (linked to auth organization), `facilities`, `staff_profiles` (user↔tenant↔role), `practitioners`.
 - [ ] Roles: `front_desk`, `practitioner`, `billing`, `pharmacy_lab`, `hospital_admin` — seed + role check helper in the oRPC procedure factory (deny-by-default: every procedure declares allowed roles or fails closed).
-- [ ] Tenant context middleware: resolve tenant from session on every request; set Postgres session GUCs (`app.tenant_id`, `app.user_id`) per transaction — adapt `002_rls_context.sql` from the [schema menu](./reference/schema-menu.md).
-- [ ] RLS: enable + FORCE on all tenant-scoped tables from the first migration; adapt the [schema menu](./reference/schema-menu.md)'s policy loop.
+- [ ] Tenant context middleware: resolve Tenant from the Better Auth organization/session on every request; verify membership server-side; never accept `tenant_id` from client input.
+- [ ] Tenant-scoped query helpers/procedure context: every PHI read/write requires Tenant context, scopes by `tenant_id`, and exposes no unscoped DB helpers to feature code.
 - [ ] `audit_events` table (append-only; app DB role has INSERT/SELECT only) + `audit()` helper wired into the procedure factory so PHI procedures emit events without per-endpoint boilerplate; the event is inserted **in the same transaction** as the write it records.
 - [ ] PHI-safe logger wrapper over `@tsu-stack/logger`: accepts IDs/codes/metrics only; CI grep/test that fails on known PHI field names in log calls.
 - [ ] Seed script: two synthetic tenants, one facility each, users per role, fake patients.
-- [ ] CI: typecheck, lint, unit tests, **cross-tenant denial tests** (tenant A queries tenant B via API and raw SQL → both fail), audit-emission test, PHI-log test.
+- [ ] CI: typecheck, lint, unit tests, **cross-tenant denial tests** (tenant A attempts tenant B access via API/procedure helpers → fails), audit-emission test, PHI-log test.
 - [ ] Deploy skeleton to the VPS via Coolify now (deploy pain surfaces early, not in week 9); TLS, secrets via dotenvx, Postgres volume encryption or encrypted disk.
 
 **Exit gate:** synthetic user logs in → creates a record in tenant A → audit event exists → tenant B cannot see it (proven in CI) → app runs on the real VPS over TLS.
@@ -84,7 +84,7 @@ The repo today is a pristine tsu-stack starter (TanStack Start + Hono + oRPC + D
 - [ ] `payments`: cash + manual UPI reference; partial payment allowed; receipt print.
 - [ ] Invoice/receipt print views (match hospital's current format where sane).
 - [ ] Day summary screen (collections by mode, invoice count) + **ordered-not-billed report** (the leakage number is the ROI headline for the owner).
-- [ ] **Accountant exports** ([ADR-0007](./adr/0007-accounting-boundary-books-integration.md)): GST-ready invoice register + collections register + day-close summary as CSV — parity with what the incumbent gives the CA for Tally/ITR. No patient names in exports beyond what the CA genuinely needs.
+- [ ] **Accountant exports** ([ADR-0007](./adr/0007-accounting-boundary-books-integration.md), [ADR-0008](./adr/0008-accounting-connector-export-ledger.md)): GST-ready invoice register + collections register + day-close summary as CSV — parity with what the incumbent gives the CA for Tally/ITR. Use stable HMS source references in exported rows so future connector backfills can dedupe. No patient names in exports beyond what the CA genuinely needs.
 - [ ] Audit on invoice finalize / payment / print / export.
 
 **Exit gate:** end-to-end synthetic demo — register → token → consult → sign → Rx print → orders → work queues → charges → invoice → payment → day summary reconciles to the rupee; ordered-not-billed catches a seeded dropped charge.
@@ -108,7 +108,7 @@ The repo today is a pristine tsu-stack starter (TanStack Start + Hono + oRPC + D
 - [ ] Load sanity: one day's realistic volume (registrations, tokens, invoices) on the VPS without degradation.
 - [ ] Rollback plan: tagged releases, tested `docker compose` rollback, migration down-strategy or restore-based rollback.
 
-**Exit gate (Go-live gate):** restore drill passed · deny/RLS/audit/PHI-log CI suites green · advisor sign-off done · pilot agreement signed · staff trained · fallback playbook agreed · founder go/no-go recorded.
+**Exit gate (Go-live gate):** restore drill passed · deny/tenant-scope/audit/PHI-log CI suites green · advisor sign-off done · pilot agreement signed · staff trained · fallback playbook agreed · founder go/no-go recorded.
 
 ---
 
@@ -121,7 +121,7 @@ The repo today is a pristine tsu-stack starter (TanStack Start + Hono + oRPC + D
 - [ ] Go live front-desk-first (registration+queue on day 1; doctor and billing stations within the same week — staged by station, not big-bang).
 - [ ] Daily on-site or on-call presence for week 1–2; same-day fixes for workflow blockers.
 - [ ] Weekly metrics review with owner + advisor: registrations/day, signed encounters/day per doctor, invoices/day, ordered-not-billed trend, per-station usage (watch for silent abandonment — the dual-run risk).
-- [ ] Log outage minutes; if material, re-open the connectivity decision in [ADR-0003](./adr/0003-single-vps-single-postgres-rls.md).
+- [ ] Log outage minutes; if material, re-open the connectivity decision in [ADR-0003](./adr/0003-single-vps-app-tenancy.md).
 - [ ] Feedback triage: single list, weekly cutline conversation — additions require removals.
 - [ ] End-of-pilot review with the hospital: which workflows won, the dual-run exit story ([ADR-0006](./adr/0006-coexistence-pilot-no-inventory.md)), reference/testimonial, commercial terms.
 
@@ -147,11 +147,11 @@ Versioned drug dictionary + licensed interaction/allergy rule source → `Medica
 
 ### Phase 9 — Tenant #2 and SaaS-ification
 
-Second tenant on the same stack (the test [ADR-0003](./adr/0003-single-vps-single-postgres-rls.md) was designed for) → tenant provisioning script → graduate Risk Register items: per-tenant key handling, support-access workflow, break-glass, hash-chained audit export → pricing/packaging → managed Postgres / second node when ops pain, not before.
+Second tenant on the same stack (the test [ADR-0003](./adr/0003-single-vps-app-tenancy.md) was designed for) → tenant provisioning script → graduate Risk Register items: database-enforced tenant isolation/RLS decision, per-tenant key handling, support-access workflow, break-glass, hash-chained audit export → pricing/packaging → managed Postgres / second node when ops pain, not before.
 
 ### Later vision phases (from the PRD — built, but only on pull)
 
-The long-term intent is the full PRD suite; these queue behind Phases 6–9 and enter the roadmap when a paying customer or pilot learning pulls them, not on a calendar: **edernal-books integration** (day-close journal feed into books' Phase-6 public API — one-way, aggregate, PHI-free per [ADR-0007](./adr/0007-accounting-boundary-books-integration.md)) · claims assist/NHCX (PRD R7) · IPD suite (PRD P2 — the generic Encounter model is the insurance already being paid) · pharmacy inventory (owned by HMS when built, valuations posted to accounting — [ADR-0007](./adr/0007-accounting-boundary-books-integration.md)) · owner analytics + NL Q&A · patient app/WhatsApp assistant · offline/edge (baseline ADR-4 design, trigger: >2% consult-hours offline) · regional-language expansion · config-pack service + global compliance packs (with geography #2) · marketplace/API · customer-managed deployment (enterprise tier only).
+The long-term intent is the full PRD suite; these queue behind Phases 6–9 and enter the roadmap when a paying customer or pilot learning pulls them, not on a calendar: **accounting connectors** (day-close feed into Edernal Books, Tally, CSV, or another configured destination — one-way, aggregate, PHI-free, source-keyed, and preview-first per [ADR-0007](./adr/0007-accounting-boundary-books-integration.md) and [ADR-0008](./adr/0008-accounting-connector-export-ledger.md)) · claims assist/NHCX (PRD R7) · IPD suite (PRD P2 — the generic Encounter model is the insurance already being paid) · pharmacy inventory (owned by HMS when built, valuations posted to accounting — [ADR-0007](./adr/0007-accounting-boundary-books-integration.md)) · owner analytics + NL Q&A · patient app/WhatsApp assistant · offline/edge (baseline ADR-4 design, trigger: >2% consult-hours offline) · regional-language expansion · config-pack service + global compliance packs (with geography #2) · marketplace/API · customer-managed deployment (enterprise tier only).
 
 ---
 

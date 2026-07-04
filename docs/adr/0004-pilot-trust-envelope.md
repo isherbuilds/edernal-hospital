@@ -8,7 +8,7 @@ The Minimum Viable Compliance spec listed ~20 controls before real PHI. For a so
 
 1. OIDC/Better Auth login, unique accounts, MFA for admin roles.
 2. Role-based access (front desk / practitioner / billing / pharmacy-lab / admin) with deny-by-default API middleware and automated deny tests.
-3. `tenant_id` on every tenant-owned table; Postgres RLS enabled and CI-tested with two synthetic tenants.
+3. `tenant_id` / Better Auth organization ID on every tenant-owned table; server-enforced tenant scoping via procedure context/query helpers; cross-tenant denial tests with two synthetic tenants.
 4. Append-only Audit Event on every PHI read/write/search/print/export, queryable by patient/actor/date.
 5. Encryption at rest (disk/volume level) + TLS everywhere; secrets out of the repo.
 6. PHI-safe logging: logger wrapper that takes IDs/codes only, plus a redaction test that fails CI if known PHI field names appear in log calls.
@@ -19,6 +19,7 @@ The Minimum Viable Compliance spec listed ~20 controls before real PHI. For a so
 
 - Break-glass workflow (pilot mitigation: small trusted staff, all access audited).
 - Purpose-of-use policy engine and ABAC attributes beyond role+tenant+facility (mitigation: coarse roles are honest at this scale).
+- Postgres RLS / database-enforced tenant isolation (mitigation: one real tenant exists at pilot; app-level scoping is mandatory and tested; revisit before hospital #2 or self-serve SaaS).
 - Per-tenant KMS keys and envelope encryption (mitigation: one tenant exists; disk encryption + audited access).
 - Hash-chained / Merkle-sealed audit storage (mitigation: append-only table + DB role that cannot UPDATE/DELETE audit rows).
 - Support-access approval workflow and time-bound elevation UI (mitigation: the founder is support; every access still audited; documented in the pilot agreement).

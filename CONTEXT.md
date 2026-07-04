@@ -86,15 +86,26 @@ _Avoid_: bill (ambiguous with Draft Bill)
 **Payment**:
 Money received against an Invoice: cash or manual UPI reference at pilot. Gateway integration is post-pilot.
 
+**Billed Today**:
+The total finalized Invoice value for the business day, net of discounts and credit notes. This answers what the hospital charged today, not what it collected.
+_Avoid_: earned today
+
+**Collected Today**:
+The total Payments received during the business day, split by mode (cash, manual UPI/bank, credit). This answers cash movement, not billable work performed.
+_Avoid_: earned today
+
+**Discounts Given Today**:
+The total discount value approved or applied during the business day, shown separately from Billed Today so discounts are visible to the owner.
+
 **Ordered-not-billed**:
 The revenue-leakage report listing completed Orders whose Charges never reached an Invoice.
 
 **Accountant Export**:
-The CSV registers (invoices, collections, day-close summary, GST fields) HMS produces for the hospital's accountant/CA — the seam to Tally today and to edernal-books later. HMS never contains a general ledger.
+The CSV registers or connector batches (invoices, collections, day-close summary, GST fields, and later inventory valuation) HMS produces for the hospital's accountant/CA. The seam can target Tally, Edernal Books, CSV, or another configured accounting destination. HMS never contains a general ledger.
 _Avoid_: accounting module, GL (as an HMS feature)
 
 **Day-close Posting**:
-The future one-way, aggregate, PHI-free journal feed from HMS day-close into edernal-books.
+The future one-way, aggregate, PHI-free accounting feed from HMS day-close into the configured accounting connector. It keeps separate `occurredAt`, `businessDate`, `exportedAt`, and `postedAt` timestamps so 24/7 hospital operations do not depend on a midnight cutoff.
 
 ### Trust
 
@@ -106,7 +117,7 @@ The append-only record of who did what to which PHI, when, in which Tenant. Ever
 _Avoid_: log (operational logs are a separate, PHI-free stream)
 
 **Trust Envelope**:
-The set of security controls that must pass before real Patient data enters the system: auth and roles, tenant isolation with RLS, Audit Events, encryption at rest, PHI-safe logs, tested backups.
+The set of security controls that must pass before real Patient data enters the system: auth and roles, tested tenant isolation, Audit Events, encryption at rest, PHI-safe logs, tested backups.
 
 **Risk Register**:
 The written list of deliberately deferred controls (break-glass, purpose-of-use engine, per-tenant KMS, hash-chained audit) with founder risk acceptance.
