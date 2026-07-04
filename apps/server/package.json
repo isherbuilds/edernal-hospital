@@ -9,9 +9,10 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "build": "cross-env IS_BUILD=true vp pack",
-    "compile": "cross-env IS_BUILD=true BUILD_EXE=true pnpm dotenvx run -f ../../packages/env/.env -- vp pack",
+    "build": "cross-env NODE_ENV=production IS_BUILD=true vp pack",
+    "compile": "cross-env NODE_ENV=production IS_BUILD=true BUILD_EXE=true pnpm dotenvx run -f ../../packages/env/.env -- vp pack",
     "dev": "pnpm dotenvx run -f ../../packages/env/.env -- node --import tsx --watch src/index.ts",
+    "seed": "pnpm dotenvx run -f ../../packages/env/.env -- node --import tsx src/seed/index.ts",
     "start": "pnpm dotenvx run -f ../../packages/env/.env -- node .output/index.mjs"
   },
   "dependencies": {
@@ -23,6 +24,7 @@
     "@orpc/zod": "catalog:",
     "@tsu-stack/api": "workspace:*",
     "@tsu-stack/auth": "workspace:*",
+    "@tsu-stack/core": "workspace:*",
     "@tsu-stack/db": "workspace:*",
     "@tsu-stack/env": "workspace:*",
     "@tsu-stack/logger": "workspace:*",

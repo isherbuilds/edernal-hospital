@@ -242,13 +242,29 @@ TanStack Start uses [Nitro](https://nitro.build) as its server engine, which mea
 
 For the Hono server, use the following environment variables:
 
-| Variable Name          | Required | Default Value | Description                                                                                      |
-| ---------------------- | -------- | ------------- | ------------------------------------------------------------------------------------------------ |
-| `VITE_SERVER_URL`      | ✅       | -             | Base URL for the server. May also include a subpath if needed, ex: `https://example.com/server`. |
-| `VITE_WEB_URL`         | ✅       | -             | Base URL for the web app. May also include a subpath if needed, ex: `https://example.com/web`.   |
-| `BETTER_AUTH_SECRET`   | ✅       | -             | Secret key for Better-Auth. Generate with `vp run auth:secret`.                                  |
-| `DATABASE_URL`         | ✅       | -             | PostgreSQL connection string.                                                                    |
-| `ENABLE_OPEN_API_DOCS` | ❌       | `false`       | Enable OpenAPI `/docs` endpoint.                                                                 |
+| Variable Name            | Required              | Default Value | Description                                                                                                               |
+| ------------------------ | --------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `VITE_SERVER_URL`        | ✅                    | -             | Base URL for the server. May also include a subpath if needed, ex: `https://example.com/server`.                          |
+| `VITE_WEB_URL`           | ✅                    | -             | Base URL for the web app. May also include a subpath if needed, ex: `https://example.com/web`.                            |
+| `BETTER_AUTH_SECRET`     | ✅                    | -             | Secret key for Better-Auth. Generate with `vp run auth:secret`.                                                           |
+| `DATABASE_URL`           | ✅                    | -             | Runtime app PostgreSQL connection string. In production this must use the app runtime role, not the owner migration role. |
+| `DATABASE_MIGRATION_URL` | ✅ for migration jobs | -             | Owner/DDL PostgreSQL connection string used by migration jobs. Do not provide this to normal runtime services.            |
+| `ENABLE_OPEN_API_DOCS`   | ❌                    | `false`       | Enable OpenAPI `/docs` endpoint.                                                                                          |
+
+Production migrations run through `vp run db:migrate`. The migration job uses
+`DATABASE_MIGRATION_URL` for DDL, derives the runtime database role from
+`DATABASE_URL`, grants normal app-table DML to that role, and restricts
+`audit_events` to `SELECT`/`INSERT` only.
+
+Phase 0 is a pre-production baseline reset. Do not apply the Phase 0 baseline
+migration set to a database that already recorded the deleted
+`20260329172617_superb_black_bolt` migration; reset that database first, then
+run `vp run db:migrate`.
+
+For production-like deploys, provision distinct database credentials before
+running the migration job: `DATABASE_MIGRATION_URL` must use an owner/DDL role,
+while `DATABASE_URL` must use the app runtime role. The normal server and web
+services should receive only `DATABASE_URL`.
 
 ### Web
 
@@ -259,7 +275,7 @@ For the web app, use the following environment variables:
 | `VITE_SERVER_URL`         | ✅       | -             | Base URL for the server. May also include a subpath if needed, ex: `https://example.com/server`.                                    |
 | `VITE_WEB_URL`            | ✅       | -             | Base URL for the web app. May also include a subpath if needed, ex: `https://example.com/web`.                                      |
 | `BETTER_AUTH_SECRET`      | ✅       | -             | Secret key for Better-Auth. Generate with `vp run auth:secret`.                                                                     |
-| `DATABASE_URL`            | ✅       | -             | PostgreSQL connection string.                                                                                                       |
+| `DATABASE_URL`            | ✅       | -             | Runtime app PostgreSQL connection string. In production this should use the app role, not the owner migration role.                 |
 | `VITE_IMGPROXY_URL`       | ❌       | -             | URL for image optimization. You'll need to deploy your own [imgproxy](https://hub.docker.com/r/darthsim/imgproxy/) container first. |
 | `VITE_IMGPROXY_SIGNATURE` | ❌       | `_`           | imgproxy signature path segment. Use `insecure` or a precomputed signature if your imgproxy setup requires it.                      |
 
@@ -328,8 +344,6 @@ Then lastly, remove the `serve()` call in `apps/server/src/index.ts` since the H
 -import { serve } from "@hono/node-server";
 
 void (async () => {
-  await migrateDatabase()
-
 -  serve(
 -    {
 -      fetch: app.fetch,

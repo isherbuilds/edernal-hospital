@@ -20,7 +20,7 @@ This guide is intentionally repo-specific. It documents the current preferred wa
 Define routes with the shared procedure factories from `packages/api/src/lib/procedures/factory.ts`.
 
 - Use `publicProcedure` for public read operations.
-- Use `protectedProcedure` for authenticated operations.
+- Use `tenantProcedure(inputSchema, roles)` for tenant-scoped staff operations.
 - Add route metadata with `.route({ description, method })`.
 - Define `input(...)` and `output(...)` schemas explicitly with Zod.
 - Prefer returning repo-native shapes directly instead of renaming fields unless there is a strong product reason.
@@ -65,7 +65,7 @@ Prefer type-safe oRPC errors with `.errors(...)` on the procedure base.
 Example:
 
 ```ts
-const protectedExampleProcedure = protectedProcedure.errors({
+const exampleProcedure = publicProcedure.errors({
   RATE_LIMITED: {
     data: z.object({
       retryAfter: z.number().int().min(1)

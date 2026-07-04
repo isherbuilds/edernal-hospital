@@ -14,9 +14,9 @@ export function LoggerProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (user) {
-      setIdentity({ user: { id: user.id } });
+      setIdentity({ userId: user.id });
     } else {
-      setIdentity({ user: { id: "anonymous" } });
+      setIdentity({ userId: "anonymous" });
     }
 
     return () => {
@@ -30,7 +30,10 @@ export function LoggerProvider({ children }: { children: React.ReactNode }) {
 export function useLogger(): typeof log {
   const context = useContext(LoggerContext);
   if (!context) {
-    log.warn("logger-provider", "Called outside of LoggerProvider");
+    log.warn({
+      event: "logger_provider_missing",
+      reason: "outside_provider"
+    });
     return log;
   }
   return context.logger;

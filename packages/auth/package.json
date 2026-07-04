@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@better-auth/drizzle-adapter": "catalog:",
+    "@tsu-stack/core": "workspace:*",
     "better-auth": "catalog:"
   },
   "devDependencies": {

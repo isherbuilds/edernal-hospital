@@ -7,7 +7,7 @@ The design-partner hospital already runs software that handles pharmacy stock an
 ## Why
 
 - Building inventory management to parity with an incumbent, in weeks, solo, is unwinnable — and unnecessary, since the incumbent keeps doing it.
-- Order routing is the piece that closes *our* loops: the doctor loop (orders leave the consult room digitally) and the billing loop (ordered-not-billed leakage becomes measurable).
+- Order routing is the piece that closes _our_ loops: the doctor loop (orders leave the consult room digitally) and the billing loop (ordered-not-billed leakage becomes measurable).
 - Registration is greenfield (patients register fresh in our system); no migration is on the critical path.
 
 ## Consequences

@@ -2,9 +2,30 @@ import { defineRelations } from "drizzle-orm";
 
 import * as schema from "#@/schema/index";
 
-export const relations = defineRelations(schema, (_r) => {
+export const relations = defineRelations(schema, (r) => {
   return {
-    // TODO: Define your relations here
-    // https://orm.drizzle.team/docs/relations-v2
+    auditEvents: {
+      tenant: r.one.organization({
+        from: r.auditEvents.tenantId,
+        to: r.organization.id
+      })
+    },
+    facilities: {
+      tenant: r.one.organization({
+        from: r.facilities.tenantId,
+        to: r.organization.id
+      })
+    },
+    practitioners: {
+      tenant: r.one.organization({
+        from: r.practitioners.tenantId,
+        to: r.organization.id
+      }),
+      user: r.one.user({
+        from: r.practitioners.userId,
+        optional: true,
+        to: r.user.id
+      })
+    }
   };
 });

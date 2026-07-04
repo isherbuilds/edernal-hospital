@@ -13,6 +13,7 @@ type ClientLoggerConfig = {
 };
 
 type LogMethod = typeof evlogLog.info;
+type LogMethodName = "debug" | "error" | "info" | "warn";
 
 const DEFAULT_CLIENT_LOGGER_CONFIG = {
   service: LOG_SERVICES.DEFAULT
@@ -20,11 +21,6 @@ const DEFAULT_CLIENT_LOGGER_CONFIG = {
 
 let isInitialized = false;
 let identityContext: Record<string, unknown> = {};
-
-const debugLogMethod = evlogLog.debug.bind(evlogLog) as LogMethod;
-const errorLogMethod = evlogLog.error.bind(evlogLog) as LogMethod;
-const infoLogMethod = evlogLog.info.bind(evlogLog) as LogMethod;
-const warnLogMethod = evlogLog.warn.bind(evlogLog) as LogMethod;
 
 function isBrowserRuntime() {
   return typeof window !== "undefined" && typeof document !== "undefined";
@@ -94,14 +90,14 @@ export { LOG_SERVICES };
  * import { log } from "@tsu-stack/logger/client";
  *
  * log.info({ event: "page_view", path: location.pathname });
- * log.error({ event: "global_error_boundary", error });
+ * log.error({ code: "UNHANDLED_ERROR", event: "global_error_boundary" });
  * ```
  */
 export const log = {
-  debug: withIdentity(debugLogMethod),
-  error: withIdentity(errorLogMethod),
-  info: withIdentity(infoLogMethod),
-  warn: withIdentity(warnLogMethod)
+  debug: withIdentity("debug"),
+  error: withIdentity("error"),
+  info: withIdentity("info"),
+  warn: withIdentity("warn")
 } satisfies typeof evlogLog;
 
 /**
@@ -111,7 +107,7 @@ export const log = {
  * ```ts
  * import { setIdentity } from "@tsu-stack/logger/client";
  *
- * setIdentity({ user: { id: user.id } });
+ * setIdentity({ userId: user.id });
  * ```
  */
 export function setIdentity(identity: Record<string, unknown>) {
@@ -140,14 +136,16 @@ export function clearIdentity() {
   identityContext = {};
 }
 
-function withIdentity(method: LogMethod): LogMethod {
-  return ((tagOrEvent: unknown, message?: string) => {
+function withIdentity(methodName: LogMethodName): LogMethod {
+  function logWithIdentity(tag: string, message: string): void;
+  function logWithIdentity(event: Record<string, unknown>): void;
+  function logWithIdentity(tagOrEvent: string | Record<string, unknown>, message?: string) {
     if (!isBrowserRuntime()) {
       return;
     }
 
-    if (isRecord(tagOrEvent) && message === undefined) {
-      method({
+    if (isRecord(tagOrEvent)) {
+      evlogLog[methodName]({
         ...identityContext,
         ...tagOrEvent
       });
@@ -155,12 +153,13 @@ function withIdentity(method: LogMethod): LogMethod {
     }
 
     if (message === undefined) {
-      method(tagOrEvent as never);
       return;
     }
 
-    method(tagOrEvent as never, message);
-  }) as LogMethod;
+    evlogLog[methodName](tagOrEvent, message);
+  }
+
+  return logWithIdentity;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

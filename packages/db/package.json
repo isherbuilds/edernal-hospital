@@ -13,9 +13,11 @@
     "db": "pnpm dotenvx run -f ../env/.env -- drizzle-kit",
     "db:dev:start": "pnpm dotenvx run -f ../env/.env -- sh -c 'docker compose -p \"${DB_DEV_PROJECT_NAME:-$(basename \"$(git rev-parse --show-toplevel)\")-db-dev}\" -f docker-compose.dev.yaml up -d'",
     "db:dev:stop": "pnpm dotenvx run -f ../env/.env -- sh -c 'docker compose -p \"${DB_DEV_PROJECT_NAME:-$(basename \"$(git rev-parse --show-toplevel)\")-db-dev}\" -f docker-compose.dev.yaml stop'",
-    "auth:generate": "vp run -w auth:generate"
+    "migrate": "pnpm dotenvx run -f ../env/.env -- node --import tsx src/migrate.ts",
+    "auth:generate": "pnpm dotenvx run -f ../env/.env -- sh -c 'mkdir -p ../../tmp && vpx @better-auth/cli@latest generate --config ../auth/src/index.ts --output ../../tmp/better-auth-schema.ts --yes'"
   },
   "dependencies": {
+    "@tsu-stack/core": "workspace:*",
     "@tsu-stack/logger": "workspace:*",
     "drizzle-orm": "catalog:",
     "postgres": "catalog:"
@@ -26,6 +28,7 @@
     "@tsu-stack/tsconfig": "workspace:*",
     "@types/node": "catalog:",
     "drizzle-kit": "catalog:",
+    "tsx": "catalog:",
     "typescript": "catalog:"
   },
   "peerDependencies": {

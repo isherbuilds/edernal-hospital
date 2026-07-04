@@ -1,27 +1,31 @@
-import { join } from "node:path";
-
 import "@tanstack/react-start/server-only";
 import { sql } from "drizzle-orm";
-import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 
 import { ENV_SERVER } from "@tsu-stack/env/server/env";
 import { createLogger } from "@tsu-stack/logger/server";
 
+import { runDatabaseMigrations } from "#@/migration-runner";
 import { relations as authRelations } from "#@/schema/auth.schema";
 import { relations } from "#@/schema/relations";
 
 export * from "drizzle-orm/sql";
+export { and, asc, desc, eq, ilike, inArray, ne, or } from "drizzle-orm";
 
+const databaseRelations = { ...relations, ...authRelations };
 const client = postgres(ENV_SERVER.DATABASE_URL);
 
 export const db = drizzle({
   client,
   // `defineRelationsPart()` must be merged after the main `defineRelations()` config.
   // https://orm.drizzle.team/docs/relations-v2#relations-parts
-  relations: { ...relations, ...authRelations }
+  relations: databaseRelations
 });
+
+export async function closeDb(): Promise<void> {
+  await client.end();
+}
 
 export async function checkIsDbReady(): Promise<boolean> {
   try {
@@ -33,8 +37,6 @@ export async function checkIsDbReady(): Promise<boolean> {
 }
 
 let migrationFnCalled = false;
-const MIGRATION_MAX_ATTEMPTS = 3;
-const MIGRATION_RETRY_DELAY_MS = 3_000;
 
 /**
  * Runs pending database migrations on startup.
@@ -71,34 +73,5 @@ export async function migrateDatabase(): Promise<void> {
     return;
   }
 
-  for (let attempt = 1; attempt <= MIGRATION_MAX_ATTEMPTS; attempt++) {
-    try {
-      await migrate(db, {
-        migrationsFolder: join(import.meta.dirname, "migrations")
-      });
-      log.emit({ attempt, event: "database_migration_completed" });
-      return;
-    } catch (error) {
-      log.error(error instanceof Error ? error : String(error), {
-        attempt,
-        event: "database_migration_failed",
-        maxAttempts: MIGRATION_MAX_ATTEMPTS
-      });
-
-      if (attempt === MIGRATION_MAX_ATTEMPTS) {
-        log.emit({ _forceKeep: true });
-        throw error;
-      }
-
-      log.emit({
-        attempt,
-        event: "database_migration_retrying",
-        maxAttempts: MIGRATION_MAX_ATTEMPTS,
-        retryDelayMs: MIGRATION_RETRY_DELAY_MS
-      });
-      await new Promise((resolve) => {
-        setTimeout(resolve, MIGRATION_RETRY_DELAY_MS);
-      });
-    }
-  }
+  await runDatabaseMigrations();
 }

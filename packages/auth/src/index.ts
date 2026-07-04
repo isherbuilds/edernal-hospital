@@ -3,11 +3,14 @@ import { join } from "node:path/posix";
 import { drizzleAdapter } from "@better-auth/drizzle-adapter/relations-v2";
 import "@tanstack/react-start/server-only";
 import { betterAuth } from "better-auth";
-import { openAPI } from "better-auth/plugins";
+import { openAPI, organization } from "better-auth/plugins";
 
+import { STAFF_ROLE } from "@tsu-stack/core/auth";
 import { db } from "@tsu-stack/db";
 import * as schema from "@tsu-stack/db/schema";
 import { ENV_SERVER } from "@tsu-stack/env/server/env";
+
+import { organizationAccessControl, organizationRoles } from "#@/organization-access";
 
 export const auth = betterAuth({
   baseURL: new URL(ENV_SERVER.VITE_SERVER_URL).origin,
@@ -38,6 +41,48 @@ export const auth = betterAuth({
   },
 
   plugins: [
+    organization({
+      ac: organizationAccessControl,
+      allowUserToCreateOrganization: false,
+      creatorRole: STAFF_ROLE.HOSPITAL_ADMIN,
+      roles: organizationRoles,
+      schema: {
+        member: {
+          additionalFields: {
+            displayNameOverride: {
+              input: true,
+              required: false,
+              type: "string"
+            },
+            employeeCode: {
+              input: true,
+              required: false,
+              type: "string"
+            }
+          }
+        },
+        organization: {
+          additionalFields: {
+            defaultTimezone: {
+              defaultValue: "Asia/Kolkata",
+              input: true,
+              required: false,
+              type: "string"
+            },
+            displayName: {
+              input: true,
+              required: false,
+              type: "string"
+            },
+            legalName: {
+              input: true,
+              required: false,
+              type: "string"
+            }
+          }
+        }
+      }
+    }),
     openAPI({
       theme: "deepSpace"
     })

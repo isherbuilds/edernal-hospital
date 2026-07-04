@@ -11,8 +11,8 @@ Two clinical-scope decisions taken together because they share one principle: **
 ## Why
 
 - ABDM has no pilot consumer (the hospital didn't ask; record sharing needs counterparties) and drags in FHIR, consent artefacts, and certification testing — the definition of post-validation work.
-- ADR-013's severe-interaction blocking gate was written for *e-Rx* (digitally transmitted prescriptions). A printed prescription reviewed and signed by the doctor introduces no new risk over the status quo. Building a credible interaction engine (licensed rule source, formulary mapping, clinical review, override audit) is a real project — doing it badly is worse than not doing it, because it creates false confidence.
-- The clinical advisor reviews the *printed Rx layout and sign-off flow* for the pilot instead — that's the real safety surface at this stage.
+- ADR-013's severe-interaction blocking gate was written for _e-Rx_ (digitally transmitted prescriptions). A printed prescription reviewed and signed by the doctor introduces no new risk over the status quo. Building a credible interaction engine (licensed rule source, formulary mapping, clinical review, override audit) is a real project — doing it badly is worse than not doing it, because it creates false confidence.
+- The clinical advisor reviews the _printed Rx layout and sign-off flow_ for the pilot instead — that's the real safety surface at this stage.
 
 ## Consequences
 

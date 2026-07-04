@@ -28,12 +28,9 @@ export function DefaultErrorPage({ error, reset }: { error: Error; reset: () => 
     loggedErrorKeys.add(errorKey);
 
     log.error({
-      action: "global_error_boundary",
-      error: {
-        message: error.message,
-        name: error.name,
-        stack: error.stack
-      }
+      code: error.name,
+      event: "global_error_boundary",
+      reason: "client_error_boundary"
     });
   }, [error]);
 

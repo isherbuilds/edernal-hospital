@@ -31,7 +31,7 @@ export const Route = createFileRoute("/{-$locale}/(root-layout)/(auth)/dashboard
 function RouteComponent() {
   const { user } = Route.useRouteContext();
 
-  const privateData = useQuery(orpc.private.data.queryOptions());
+  const healthData = useQuery(orpc.health.ready.queryOptions());
   const isClient = useIsClient();
 
   return (
@@ -44,12 +44,12 @@ function RouteComponent() {
         <div className="rounded-lg border p-4">
           <div className="mb-4 flex items-center gap-2">
             <div
-              className={`h-2 w-2 rounded-full ${isClient && privateData.data && !privateData.isLoading ? `bg-success` : `bg-destructive`}`}
+              className={`h-2 w-2 rounded-full ${isClient && healthData.data && !healthData.isLoading ? `bg-success` : `bg-destructive`}`}
             />
             <span className="text-sm text-muted-foreground">
-              {!isClient || privateData.isLoading
+              {!isClient || healthData.isLoading
                 ? m.dashboard_page__checking()
-                : privateData.data
+                : healthData.data
                   ? m.dashboard_page__successfully_fetched()
                   : m.dashboard_page__failed_to_fetch()}
             </span>
@@ -57,7 +57,7 @@ function RouteComponent() {
 
           <pre className="overflow-auto rounded bg-muted p-2 text-sm">
             {isClient ? (
-              JSON.stringify(privateData.data, null, 2)
+              JSON.stringify(healthData.data, null, 2)
             ) : (
               <Spinner className="mx-auto my-28" />
             )}

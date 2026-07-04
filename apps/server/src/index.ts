@@ -16,7 +16,6 @@ import { type ContentfulStatusCode } from "hono/utils/http-status";
 import { createContext } from "@tsu-stack/api/lib/context/hono/create-context";
 import { appRouter } from "@tsu-stack/api/routers/index";
 import { auth } from "@tsu-stack/auth/index";
-import { migrateDatabase } from "@tsu-stack/db";
 import { ENV_SERVER } from "@tsu-stack/env/server/env";
 import { log, parseError } from "@tsu-stack/logger/server";
 import {
@@ -60,7 +59,11 @@ app.onError((error, c) => {
   if (requestLog) {
     requestLog.error(error);
   } else {
-    log.error({ event: "hono_global_error", error });
+    log.error({
+      code: "HONO_GLOBAL_ERROR",
+      event: "hono_global_error",
+      reason: "request_logger_unavailable"
+    });
   }
 
   const parsed = parseError(error);
@@ -94,7 +97,7 @@ app.get("/auth/open-api/generate-schema", async (c) => {
 
 app.on(["POST", "GET"], "/auth/*", async (c) => auth.handler(c.req.raw));
 
-export const openApiHandler = new OpenAPIHandler(appRouter, {
+const openApiHandler = new OpenAPIHandler(appRouter, {
   interceptors: [
     onError((error, { context }) => {
       context.logger.set({ handler: "openapi" });
@@ -160,7 +163,7 @@ export const openApiHandler = new OpenAPIHandler(appRouter, {
   ]
 });
 
-export const rpcHandler = new RPCHandler(appRouter, {
+const rpcHandler = new RPCHandler(appRouter, {
   interceptors: [
     onError((error, { context }) => {
       context.logger.set({ handler: "rpc" });
@@ -209,18 +212,17 @@ app.use("/*", async (c, next) => {
 });
 
 void (async () => {
-  await migrateDatabase();
-
   serve(
     {
       fetch: app.fetch,
       port: 5000
     },
     (info) => {
-      log.info(
-        "server",
-        `Server is running on http://localhost:${info.port}${new URL(ENV_SERVER.VITE_SERVER_URL).pathname}`
-      );
+      log.info({
+        basePath: new URL(ENV_SERVER.VITE_SERVER_URL).pathname,
+        event: "server_started",
+        port: info.port
+      });
     }
   );
 })();

@@ -13,20 +13,26 @@ The repo today is a pristine tsu-stack starter (TanStack Start + Hono + oRPC + D
 
 **Why first:** every later table and endpoint depends on tenancy, roles, and audit being in the request path. Retrofitting `tenant_id`, tenant-scoped query discipline, or audit emission across a built app is the classic irreversible mistake the old docs warned about — this is the only "platform" phase, kept deliberately small.
 
+**Implementation note (2026-07-04):** deploy/VPS/TLS work is deliberately excluded from this Phase 0 implementation pass; the founder will handle it manually.
+
+**Migration note (2026-07-04):** Phase 0 is allowed to reset the pre-production database baseline. Existing local or preview databases that recorded the old starter migration must be reset before applying the Phase 0 migrations.
+
 **Checklist**
 
-- [ ] Enable Better Auth plugins needed for a hospital: `organization` (= Tenant), `admin`, MFA for admin roles; regenerate auth schema into `@tsu-stack/db`.
-- [ ] Core tables in `@tsu-stack/db`: `tenants` (linked to auth organization), `facilities`, `staff_profiles` (user↔tenant↔role), `practitioners`.
-- [ ] Roles: `front_desk`, `practitioner`, `billing`, `pharmacy_lab`, `hospital_admin` — seed + role check helper in the oRPC procedure factory (deny-by-default: every procedure declares allowed roles or fails closed).
-- [ ] Tenant context middleware: resolve Tenant from the Better Auth organization/session on every request; verify membership server-side; never accept `tenant_id` from client input.
+- [ ] Enable Better Auth `organization` (= Tenant) plugin; verified organization membership is the Tenant boundary. Defer `twoFactor` until the admin MFA enrollment/verification UX is built; defer Better Auth `admin` until support impersonation has a signed Audit Event design.
+- [ ] Extend Better Auth `organization` with Tenant profile fields (`display_name`, `legal_name`, `default_timezone`) and `member` with lightweight Staff User attributes (`employee_code`, `display_name_override`); do not add a separate 1:1 `tenants` table.
+- [ ] Core Tenant-owned tables in `@tsu-stack/db`: `facilities`, `practitioners`, and `audit_events`, each carrying `tenant_id = organization.id`.
+- [ ] Facility is a data foreign key carried on Facility-owned rows, not an auth/scoping boundary at pilot (one Facility per pilot Tenant; role+Tenant is the access model per [ADR-0004](./adr/0004-pilot-trust-envelope.md)).
+- [ ] Role slugs/constants in `packages/core`: `front_desk`, `practitioner`, `billing`, `pharmacy_lab`, `hospital_admin`; Better Auth organization member role is authoritative; member additional fields carry lightweight Staff User attributes, never a second role source.
+- [ ] oRPC procedure factory role check helper is deny-by-default: every procedure declares allowed roles or fails closed; unauthenticated procedures (login, health) must be **explicitly marked public**.
+- [ ] Tenant context middleware: treat client-provided Tenant IDs as selectors only; verify Better Auth membership server-side before any Tenant-scoped query.
 - [ ] Tenant-scoped query helpers/procedure context: every PHI read/write requires Tenant context, scopes by `tenant_id`, and exposes no unscoped DB helpers to feature code.
-- [ ] `audit_events` table (append-only; app DB role has INSERT/SELECT only) + `audit()` helper wired into the procedure factory so PHI procedures emit events without per-endpoint boilerplate; the event is inserted **in the same transaction** as the write it records.
+- [ ] `audit_events` table: tenant-owned append-only events (`tenant_id`, actor user id, action, resource type/id, timestamp), queryable later by patient/actor/date; migrations run as owner role while the runtime app DB role has INSERT/SELECT only and no UPDATE/DELETE; `audit()` helper wires into the procedure factory so PHI procedures emit events without per-endpoint boilerplate; for writes, the event is inserted **in the same transaction** as the write it records; reads/searches also emit Audit Events through the same non-optional helper API without hard-coding one-event-per-row.
 - [ ] PHI-safe logger wrapper over `@tsu-stack/logger`: accepts IDs/codes/metrics only; CI grep/test that fails on known PHI field names in log calls.
-- [ ] Seed script: two synthetic tenants, one facility each, users per role, fake patients.
-- [ ] CI: typecheck, lint, unit tests, **cross-tenant denial tests** (tenant A attempts tenant B access via API/procedure helpers → fails), audit-emission test, PHI-log test.
-- [ ] Deploy skeleton to the VPS via Coolify now (deploy pain surfaces early, not in week 9); TLS, secrets via dotenvx, Postgres volume encryption or encrypted disk.
+- [ ] Seed script: two synthetic Better Auth organizations/Tenants, one Facility each, users per role, practitioners; the seed grows with each phase.
+- [ ] CI: typecheck, lint, unit tests, reusable **cross-tenant denial test harness** against Phase-0 Tenant-owned resources (Practitioner/Facility records; later phases extend it), audit-emission tests for read and write paths, PHI-log test.
 
-**Exit gate:** synthetic user logs in → creates a record in tenant A → audit event exists → tenant B cannot see it (proven in CI) → app runs on the real VPS over TLS.
+**Exit gate:** synthetic `hospital_admin` selects Tenant A → creates a Practitioner or Facility record → write Audit Event exists → reads it back and read Audit Event exists → wrong-role user calling a restricted procedure is denied (proven in CI) → Tenant B cannot see it (proven in CI).
 
 ---
 
