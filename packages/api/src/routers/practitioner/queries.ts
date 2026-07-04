@@ -4,6 +4,7 @@ import { z } from "zod";
 import { and, asc, eq } from "@tsu-stack/db";
 import { practitioners } from "@tsu-stack/db/schema";
 
+import { isUniqueConstraintError } from "#@/lib/db-errors";
 import { TenantScopeInputSchema } from "#@/lib/tenancy/scope";
 import { type TenantTxScope } from "#@/lib/tenancy/scoped-db";
 
@@ -50,19 +51,6 @@ function toPractitionerOutput(row: PractitionerRow): PractitionerOutput {
     updatedAt: row.updatedAt.toISOString(),
     userId: row.userId
   };
-}
-
-function isUniqueConstraintError(error: unknown, constraintName: string) {
-  if (!error || typeof error !== "object") {
-    return false;
-  }
-
-  return (
-    "code" in error &&
-    "constraint_name" in error &&
-    error.code === "23505" &&
-    error.constraint_name === constraintName
-  );
 }
 
 export async function createPractitioner(

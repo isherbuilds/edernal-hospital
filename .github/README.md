@@ -129,7 +129,7 @@ Here is a non-exhaustive list of the main technologies used in this project, alo
 6. **Seed local Staff User accounts (optional)**:
 
    ```bash
-   SEED_PASSWORD="replace-with-a-local-seed-password" vp run seed
+   SEED_PASSWORD="replace-with-a-local-seed-password" vp run --filter @tsu-stack/server seed
    ```
 
    The seed password is read from `SEED_PASSWORD` and is not printed to stdout.
