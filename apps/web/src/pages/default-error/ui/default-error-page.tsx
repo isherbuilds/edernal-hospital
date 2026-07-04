@@ -28,21 +28,20 @@ export function DefaultErrorPage({ error, reset }: { error: Error; reset: () => 
     loggedErrorKeys.add(errorKey);
 
     log.error({
-      action: "global_error_boundary",
+      code: error.name,
       error: {
         message: error.message,
         name: error.name,
         stack: error.stack
-      }
+      },
+      event: "global_error_boundary",
+      reason: "client_error_boundary"
     });
   }, [error]);
 
   const handleRefresh = () => {
     reset();
   };
-
-  // Could also send to external service
-  // sendErrorToService(error)
 
   return (
     <CenteredLayout>

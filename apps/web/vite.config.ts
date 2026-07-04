@@ -55,7 +55,8 @@ export default defineConfig({
   run: {
     tasks: {
       build: {
-        command: "cross-env IS_BUILD=true pnpm dotenvx run -f ../../packages/env/.env -- vp build",
+        command:
+          "cross-env NODE_ENV=production IS_BUILD=true pnpm dotenvx run -f ../../packages/env/.env -- vp build",
         dependsOn: ["@tsu-stack/i18n#build"],
         // These environment variables are dependencies of the build process and need to be passed here to be picked up by the Vite Task runner.
         // CAUTION: These are hardcoded into the image. You should consider Build Secrets for sensitive values.

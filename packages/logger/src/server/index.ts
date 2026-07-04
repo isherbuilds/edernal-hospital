@@ -12,6 +12,8 @@ import {
   type RequestLogger as EvlogRequestLogger
 } from "evlog";
 
+import { PHI_FIELD_BANLIST } from "@tsu-stack/core/phi";
+
 import { LOG_SERVICES } from "#@/constants/services";
 
 type ServerLoggerConfig = EvlogLoggerConfig;
@@ -27,7 +29,8 @@ const DEFAULT_REDACT_PATHS = [
   "set-cookie",
   "token",
   "accessToken",
-  "refreshToken"
+  "refreshToken",
+  ...PHI_FIELD_BANLIST
 ];
 
 const DEFAULT_SERVER_LOGGER_CONFIG = {

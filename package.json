@@ -19,7 +19,7 @@
     "db:dev:stop": "vp run --filter @tsu-stack/db db:dev:stop",
     "db:push": "vp run -w db push",
     "db:generate": "vp run -w db generate",
-    "db:migrate": "vp run -w db migrate",
+    "db:migrate": "vp run --filter @tsu-stack/db migrate",
     "db:studio": "vp run -w db studio",
     "docker:up": "pnpm dotenvx run -f .env.docker docker -- compose up",
     "docker:up:build": "pnpm dotenvx run -f .env.docker docker -- compose up --build",

@@ -19,6 +19,7 @@ export async function createContext({
   });
   return {
     logger,
+    requestId: context.req.header("X-Request-Id"),
     session
   };
 }
