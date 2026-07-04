@@ -9,6 +9,7 @@ allowBuilds:
 
 catalog:
   "@babel/core": 8.0.1
+  "@base-ui/react": ^1.6.0
   "@better-auth/drizzle-adapter": https://pkg.pr.new/@better-auth/drizzle-adapter@652115b
   "@bprogress/react": 1.2.7
   "@commitlint/cli": 21.0.2
@@ -71,7 +72,6 @@ catalog:
   next-themes: 0.4.6
   nitro: npm:nitro-nightly@3.0.1-20260128-211656-ae83c97e
   postgres: 3.4.9
-  radix-ui: 1.6.0
   react: 19.2.7
   react-dom: 19.2.7
   react-icons: 5.6.0
@@ -102,7 +102,6 @@ minimumReleaseAgeExclude:
   - vite-plus@0.2.0
 
 overrides:
-  kysely: 0.29.2
   vite: "catalog:"
   drizzle-orm: "catalog:"
 peerDependencyRules:

@@ -34,17 +34,23 @@ export function Navbar() {
             const label = link.label();
 
             return (
-              <Button asChild key={link.href ?? link.to} size="sm" variant="ghost">
-                {link.href ? (
-                  <a className="hover:text-foreground" target="_blank" href={link.href}>
-                    {label}
-                  </a>
-                ) : (
-                  <Link className="hover:text-foreground" to={link.to}>
-                    {label}
-                  </Link>
-                )}
-              </Button>
+              <Button
+                key={link.href ?? link.to}
+                nativeButton={false}
+                render={
+                  link.href ? (
+                    <a className="hover:text-foreground" target="_blank" href={link.href}>
+                      {label}
+                    </a>
+                  ) : (
+                    <Link className="hover:text-foreground" to={link.to}>
+                      {label}
+                    </Link>
+                  )
+                }
+                size="sm"
+                variant="ghost"
+              />
             );
           })}
           <LocaleSwitcher />

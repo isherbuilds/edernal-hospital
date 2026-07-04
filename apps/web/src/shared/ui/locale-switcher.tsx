@@ -1,9 +1,9 @@
 import { Check, Languages } from "lucide-react";
+import { type ComponentProps } from "react";
 
 import { m } from "@tsu-stack/i18n/messages";
 import { locales } from "@tsu-stack/i18n/runtime";
 import { useLocale } from "@tsu-stack/i18n/tanstack-start/components/locale-provider";
-import { type ButtonProps } from "@tsu-stack/ui/components/button";
 import { Button } from "@tsu-stack/ui/components/button";
 import {
   DropdownMenu,
@@ -14,8 +14,8 @@ import {
 import { cn } from "@tsu-stack/ui/lib/utils";
 
 type LocaleSwitcherProps = {
-  size?: ButtonProps["size"];
-  variant?: ButtonProps["variant"];
+  size?: ComponentProps<typeof Button>["size"];
+  variant?: ComponentProps<typeof Button>["variant"];
   className?: string;
 };
 
@@ -28,10 +28,17 @@ export function LocaleSwitcher({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button aria-label="Switch language" className={className} size={size} variant={variant}>
-          <Languages aria-hidden="true" size={18} />
-        </Button>
+      <DropdownMenuTrigger
+        render={
+          <Button
+            aria-label="Switch language"
+            className={className}
+            size={size}
+            variant={variant}
+          />
+        }
+      >
+        <Languages aria-hidden="true" size={18} />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         {locales.map((locale) => {

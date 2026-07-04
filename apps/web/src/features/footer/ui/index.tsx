@@ -54,10 +54,14 @@ export function Footer({
               const labelText = label();
 
               return (
-                <Button asChild key={href} size="icon-sm" variant="ghost">
-                  <Link aria-label={labelText} href={href}>
-                    {icon}
-                  </Link>
+                <Button
+                  key={href}
+                  nativeButton={false}
+                  render={<Link aria-label={labelText} href={href} />}
+                  size="icon-sm"
+                  variant="ghost"
+                >
+                  {icon}
                 </Button>
               );
             })}

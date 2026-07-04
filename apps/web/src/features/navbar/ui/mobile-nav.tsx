@@ -53,14 +53,13 @@ export function MobileNav() {
                 return (
                   <Button
                     onClick={onNavigate}
-                    asChild
                     className="w-full justify-start"
                     key={link.href ?? link.to}
+                    nativeButton={false}
+                    render={<Link {...(link.href ? { href: link.href } : { to: link.to })} />}
                     variant="ghost"
                   >
-                    <Link {...(link.href ? { href: link.href } : { to: link.to })}>
-                      <span className="max-sm:-ms-2">{label}</span>
-                    </Link>
+                    <span className="max-sm:-ms-2">{label}</span>
                   </Button>
                 );
               })}
@@ -98,15 +97,22 @@ function MobileNavAuth({ onNavigate }: { onNavigate: () => void }) {
   if (!user) {
     return (
       <div className="mt-12 flex flex-col gap-2">
-        <Button onClick={onNavigate} asChild className="w-full" variant="outline">
-          <Link to="/sign-in" search={redirect ? { redirect } : undefined}>
-            Sign In
-          </Link>
+        <Button
+          onClick={onNavigate}
+          className="w-full"
+          nativeButton={false}
+          render={<Link to="/sign-in" search={redirect ? { redirect } : undefined} />}
+          variant="outline"
+        >
+          Sign In
         </Button>
-        <Button onClick={onNavigate} className="w-full" light="skeuomorphic" asChild>
-          <Link to="/create-an-account" search={redirect ? { redirect } : undefined}>
-            Get Started
-          </Link>
+        <Button
+          onClick={onNavigate}
+          className="w-full"
+          nativeButton={false}
+          render={<Link to="/create-an-account" search={redirect ? { redirect } : undefined} />}
+        >
+          Get Started
         </Button>
       </div>
     );

@@ -17,7 +17,8 @@ Before substantial work, run `vpx @tanstack/intent@latest list`; load a matching
 
 - Prefer repo CLIs/generators for boilerplate, package tasks, codegen, and migrations. Use `vp`/`vpx` wrappers where available instead of hand-writing generated output.
 - This app is pre-production: backward compatibility is not required unless explicitly requested. Favor clean current design and major refactors when they reduce future complexity.
-- Do not stage, commit, stash, reset, or otherwise change git state unless explicitly asked. Leave edits unstaged by default.
+- Do not stage, commit, stash, reset, or otherwise change git state unless explicitly asked. Leave edits as they are by default (weather they are in unstaged or staged).
+- Sometimes i manually stage / unstage changes as i wish (even if they are your changes let them be)
 - Treat existing staged/unstaged changes as user-owned. Edit only files needed for the task, preserve unrelated changes, and keep modifications surgical.
 - Do not manually edit SQL or generated migration files unless discussed first. Change schema/source files and use the documented CLI flow to generate/apply migrations.
 

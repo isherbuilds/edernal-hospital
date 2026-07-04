@@ -10,16 +10,21 @@ export function NavbarUnauthenticatedButtons() {
 
   return (
     <>
-      <Button asChild size="sm" variant="outline">
-        <Link to="/sign-in" search={{ redirect }}>
-          {m.navbar__sign_in()}
-        </Link>
+      <Button
+        nativeButton={false}
+        render={<Link to="/sign-in" search={{ redirect }} />}
+        size="sm"
+        variant="outline"
+      >
+        {m.navbar__sign_in()}
       </Button>
-      <Link to="/create-an-account" search={{ redirect }}>
-        <Button light="skeuomorphic" size="sm">
-          {m.navbar__get_started()}
-        </Button>
-      </Link>
+      <Button
+        nativeButton={false}
+        render={<Link to="/create-an-account" search={{ redirect }} />}
+        size="sm"
+      >
+        {m.navbar__get_started()}
+      </Button>
     </>
   );
 }

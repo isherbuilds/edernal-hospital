@@ -203,11 +203,7 @@ export function CreateAnAccountForm({
           </form.Field>
 
           <Field>
-            <Button
-              light="skeuomorphic"
-              type="submit"
-              disabled={signUpMutation.isPending || signUpMutation.isSuccess}
-            >
+            <Button type="submit" disabled={signUpMutation.isPending || signUpMutation.isSuccess}>
               {signUpMutation.isPending ? m.auth__creating_account() : m.auth__create_account()}
             </Button>
           </Field>

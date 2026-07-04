@@ -25,16 +25,19 @@ export function CallToAction() {
         </p>
 
         <div className="flex items-center justify-center gap-2">
-          <Button asChild variant="outline">
-            <Link target="_blank" href="https://github.com/tsu-moe/tsu-stack">
-              <FaGithub />
-              {m.home_page__cta_github()}
-            </Link>
+          <Button
+            nativeButton={false}
+            render={<Link target="_blank" href="https://github.com/tsu-moe/tsu-stack" />}
+            variant="outline"
+          >
+            <FaGithub />
+            {m.home_page__cta_github()}
           </Button>
-          <Button asChild light="skeuomorphic">
-            <Link target="_blank" href="https://github.com/tsu-moe/tsu-stack">
-              {m.home_page__cta_documentation()}
-            </Link>
+          <Button
+            nativeButton={false}
+            render={<Link target="_blank" href="https://github.com/tsu-moe/tsu-stack" />}
+          >
+            {m.home_page__cta_documentation()}
           </Button>
         </div>
       </div>

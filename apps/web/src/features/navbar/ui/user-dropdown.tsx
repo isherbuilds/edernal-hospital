@@ -44,10 +44,10 @@ export function UserDropdown() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button aria-label="Open account menu" size="icon" variant="ghost">
-          <UserSquare aria-hidden="true" />
-        </Button>
+      <DropdownMenuTrigger
+        render={<Button aria-label="Open account menu" size="icon" variant="ghost" />}
+      >
+        <UserSquare aria-hidden="true" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="max-w-sm min-w-fit">
         <DropdownMenuLabel className="flex items-start gap-3">
@@ -55,32 +55,26 @@ export function UserDropdown() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem asChild className="cursor-pointer">
-            <Link to="/dashboard">
-              <BarChart2 aria-hidden="true" className="opacity-60" size={16} />
-              <span>{m.user_dropdown__dashboard()}</span>
-            </Link>
+          <DropdownMenuItem className="cursor-pointer" render={<Link to="/dashboard" />}>
+            <BarChart2 aria-hidden="true" className="opacity-60" size={16} />
+            <span>{m.user_dropdown__dashboard()}</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem asChild className="cursor-pointer">
-            <Link to="/privacy-policy">
-              <Lock aria-hidden="true" className="opacity-60" size={16} />
-              <span>{m.user_dropdown__privacy_policy()}</span>
-            </Link>
+          <DropdownMenuItem className="cursor-pointer" render={<Link to="/privacy-policy" />}>
+            <Lock aria-hidden="true" className="opacity-60" size={16} />
+            <span>{m.user_dropdown__privacy_policy()}</span>
           </DropdownMenuItem>
-          <DropdownMenuItem asChild className="cursor-pointer">
-            <Link to="/terms-of-service">
-              <FileText aria-hidden="true" className="opacity-60" size={16} />
-              <span>{m.user_dropdown__terms_of_service()}</span>
-            </Link>
+          <DropdownMenuItem className="cursor-pointer" render={<Link to="/terms-of-service" />}>
+            <FileText aria-hidden="true" className="opacity-60" size={16} />
+            <span>{m.user_dropdown__terms_of_service()}</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="cursor-pointer" variant="destructive" onClick={handleSignOut}>
           <LogOut aria-hidden="true" className="opacity-60" />
-          <button onClick={handleSignOut}>{m.user_dropdown__logout()}</button>
+          <span>{m.user_dropdown__logout()}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

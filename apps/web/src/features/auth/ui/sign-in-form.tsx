@@ -150,11 +150,7 @@ export function SignInForm({
           </form.Field>
 
           <Field>
-            <Button
-              light="skeuomorphic"
-              type="submit"
-              disabled={signInMutation.isPending || signInMutation.isSuccess}
-            >
+            <Button type="submit" disabled={signInMutation.isPending || signInMutation.isSuccess}>
               {signInMutation.isPending ? m.auth__signing_in() : m.auth__sign_in()}
             </Button>
           </Field>

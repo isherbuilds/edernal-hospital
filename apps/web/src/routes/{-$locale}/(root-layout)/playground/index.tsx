@@ -108,11 +108,11 @@ function PlaygroundPage() {
           >
             {m.playground_page__test_toast()}
           </Button>
-          <Button variant="outline" asChild>
-            <Link to={"/not-found" as To}>{m.playground_page__visit_not_found_page()}</Link>
+          <Button nativeButton={false} render={<Link to={"/not-found" as To} />} variant="outline">
+            {m.playground_page__visit_not_found_page()}
           </Button>
-          <Button variant="destructive" asChild>
-            <Link to="/error">{m.playground_page__visit_error_page()}</Link>
+          <Button nativeButton={false} render={<Link to="/error" />} variant="destructive">
+            {m.playground_page__visit_error_page()}
           </Button>
         </div>
       </section>
