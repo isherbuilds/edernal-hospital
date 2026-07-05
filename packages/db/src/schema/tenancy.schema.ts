@@ -41,7 +41,10 @@ export const facilities = pgTable(
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull()
   },
-  (table) => [uniqueIndex("facilities_tenant_id_code_unique").on(table.tenantId, table.code)]
+  (table) => [
+    uniqueIndex("facilities_tenant_id_id_unique").on(table.tenantId, table.id),
+    uniqueIndex("facilities_tenant_id_code_unique").on(table.tenantId, table.code)
+  ]
 );
 
 export const practitioners = pgTable(
@@ -64,6 +67,7 @@ export const practitioners = pgTable(
     userId: text("user_id").references(() => user.id, { onDelete: "set null" })
   },
   (table) => [
+    uniqueIndex("practitioners_tenant_id_id_unique").on(table.tenantId, table.id),
     index("practitioners_userId_idx").on(table.userId),
     uniqueIndex("practitioners_tenant_id_registration_unique").on(
       table.tenantId,

@@ -42,6 +42,7 @@
   "error_500__try_again": "Try Again",
   "navbar__playground": "Playground",
   "navbar__dashboard": "Dashboard",
+  "navbar__front_desk": "Front desk",
   "navbar__api_docs": "API Docs",
   "navbar__sign_in": "Sign In",
   "navbar__get_started": "Get Started",

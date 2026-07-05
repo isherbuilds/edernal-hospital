@@ -59,25 +59,20 @@ export function createTenantAudit({ insert, procedure }: CreateTenantAuditOption
     });
   }
 
+  function recordRead(action: "read" | "search", input: AuditReadInput) {
+    return record({
+      ...input,
+      action,
+      details: {
+        ...input.details,
+        resultCount: input.resultCount
+      }
+    });
+  }
+
   return {
-    read: (input) =>
-      record({
-        ...input,
-        action: "read",
-        details: {
-          ...input.details,
-          resultCount: input.resultCount
-        }
-      }),
-    search: (input) =>
-      record({
-        ...input,
-        action: "search",
-        details: {
-          ...input.details,
-          resultCount: input.resultCount
-        }
-      }),
+    read: (input) => recordRead("read", input),
+    search: (input) => recordRead("search", input),
     write: (input) => record(input)
   };
 }
