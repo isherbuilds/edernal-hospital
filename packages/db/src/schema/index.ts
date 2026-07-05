@@ -11,6 +11,15 @@ export {
   verification
 } from "#@/schema/auth.schema";
 export { auditEvents } from "#@/schema/audit.schema";
+export {
+  encounterStatus,
+  encounters,
+  patientIdentifiers,
+  patients,
+  patientSex,
+  tokenStatus,
+  tokens
+} from "#@/schema/clinical.schema";
 export { facilities, practitioners, tenantResourceStatus } from "#@/schema/tenancy.schema";
 
 export const databaseRelations = { ...relations, ...authRelations };

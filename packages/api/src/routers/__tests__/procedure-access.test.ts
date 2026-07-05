@@ -4,13 +4,12 @@ import { extname, join, relative } from "node:path";
 import { isProcedure } from "@orpc/server";
 import { describe, expect, it } from "vite-plus/test";
 
-import { setupApiTestEnv } from "#@/routers/__tests__/test-env";
+import * as factory from "#@/lib/procedures/factory";
+import { appRouter } from "#@/routers/index";
 
 const REPO_ROOT = join(import.meta.dirname, "../../../../..");
 const API_SRC_ROOT = join(REPO_ROOT, "packages/api/src");
 const API_ROUTER_ROOT = join(API_SRC_ROOT, "routers");
-
-setupApiTestEnv();
 
 function collectProcedurePaths(router: Record<string, unknown>, prefix: string[] = []): string[] {
   return Object.entries(router).flatMap(([key, value]) => {
@@ -44,8 +43,7 @@ function collectSourceFiles(directory: string): string[] {
 }
 
 describe("router procedure access", () => {
-  it("registers every expected routed procedure", async () => {
-    const { appRouter } = await import("#@/routers/index");
+  it("registers every expected routed procedure", () => {
     const procedurePaths = collectProcedurePaths(appRouter);
     procedurePaths.sort((first: string, second: string) => first.localeCompare(second));
     expect(procedurePaths).toEqual([
@@ -54,15 +52,24 @@ describe("router procedure access", () => {
       "facility.list",
       "health.live",
       "health.ready",
+      "patient.byId",
+      "patient.createIdentifier",
+      "patient.quickRegister",
+      "patient.searchByPhone",
       "practitioner.byId",
       "practitioner.create",
-      "practitioner.list"
+      "practitioner.list",
+      "queue.board",
+      "queue.checkIn",
+      "queue.practitionerDay",
+      "queue.reassign",
+      "queue.startConsult",
+      "queue.updateStatus",
+      "tenant.membership"
     ]);
   });
 
-  it("exports only sanctioned procedure factories", async () => {
-    const factory = await import("#@/lib/procedures/factory");
-
+  it("exports only sanctioned procedure factories", () => {
     expect("publicProcedure" in factory).toBe(true);
     expect("tenantProcedure" in factory).toBe(true);
     expect("allStaffRoles" in factory).toBe(false);

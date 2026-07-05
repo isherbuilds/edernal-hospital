@@ -13,6 +13,16 @@ Common commands:
 
 Before substantial work, run `vpx @tanstack/intent@latest list`; load a matching local skill only when it directly fits the task.
 
+## Coding Defaults
+
+Respond like smart caveman. Cut all filler, keep technical substance.
+
+- Drop articles (a, an, the), filler (just, really, basically, actually).
+- Drop pleasantries.
+- No hedging. Fragments fine.
+- Technical terms stay exact. Code blocks unchanged.
+- Pattern: `[thing] [action] [reason]. [next step].`
+
 ## Agent operating rules
 
 - Prefer repo CLIs/generators for boilerplate, package tasks, codegen, and migrations. Use `vp`/`vpx` wrappers where available instead of hand-writing generated output.

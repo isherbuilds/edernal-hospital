@@ -5,24 +5,20 @@ import { call } from "@orpc/server";
 import { afterEach, describe, expect, it } from "vite-plus/test";
 
 import { type AuthSession } from "@tsu-stack/auth/index";
-import { type RequestLogger } from "@tsu-stack/logger/server";
-
-import { type OrpcContext } from "#@/lib/context/types";
-import { setupApiTestEnv } from "#@/routers/__tests__/test-env";
-
-setupApiTestEnv();
-
-const { checkIsDbReady, db, eq, inArray, sql } = await import("@tsu-stack/db");
-const {
+import { checkIsDbReady, db, eq, inArray, sql } from "@tsu-stack/db";
+import {
   auditEvents,
   facilities,
   member,
   organization,
   practitioners,
-  user: authUser
-} = await import("@tsu-stack/db/schema");
-const { facilityRouter } = await import("#@/routers/facility/index");
-const { practitionerRouter } = await import("#@/routers/practitioner/index");
+  user as authUser
+} from "@tsu-stack/db/schema";
+import { type RequestLogger } from "@tsu-stack/logger/server";
+
+import { type OrpcContext } from "#@/lib/context/types";
+import { facilityRouter } from "#@/routers/facility/index";
+import { practitionerRouter } from "#@/routers/practitioner/index";
 
 type TenantFixture = {
   facilityId: string;
