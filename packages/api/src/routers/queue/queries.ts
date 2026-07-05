@@ -77,8 +77,6 @@ type EncounterRow = typeof encounters.$inferSelect;
 type TokenRow = typeof tokens.$inferSelect;
 
 const DEFAULT_TENANT_TIME_ZONE = "Asia/Kolkata";
-// Queue board/day lists poll every 3s per station; unthrottled steady-state polling (~115k rows/day/station) would drown the append-only audit trail, so repeat search events per actor are suppressed for 60s. Decision dated 2026-07-04; revisit at the Phase 4 Trust Envelope audit.
-const QUEUE_SEARCH_AUDIT_THROTTLE_MS = 60_000;
 
 function defaultTokenDate(timeZone: string): string {
   return new Intl.DateTimeFormat("en-CA", {
@@ -331,8 +329,7 @@ export async function listQueue(
   await scope.audit.search({
     details: { tokenDate },
     resourceType: "token",
-    resultCount: rows.length,
-    throttleMs: QUEUE_SEARCH_AUDIT_THROTTLE_MS
+    resultCount: rows.length
   });
 
   return rows.map(toQueueTokenOutput);
@@ -397,11 +394,20 @@ export async function updateTokenStatus(
   const [token] = await scope.tx
     .update(tokens)
     .set({ status: input.status })
-    .where(and(eq(tokens.tenantId, scope.tenantId), eq(tokens.id, input.tokenId)))
+    .where(
+      and(
+        eq(tokens.tenantId, scope.tenantId),
+        eq(tokens.id, input.tokenId),
+        eq(tokens.status, currentToken.status)
+      )
+    )
     .returning();
 
   if (!token) {
-    throw new Error("Failed to update Queue token");
+    throw new ORPCError("CONFLICT", {
+      message: "Queue token status changed. Reload and retry.",
+      status: 409
+    });
   }
 
   if (encounterPatch) {
@@ -472,11 +478,31 @@ export async function reassignToken(
       sequence,
       status: "waiting"
     })
-    .where(and(eq(tokens.tenantId, scope.tenantId), eq(tokens.id, input.tokenId)))
-    .returning();
+    .where(
+      and(
+        eq(tokens.tenantId, scope.tenantId),
+        eq(tokens.id, input.tokenId),
+        eq(tokens.status, current.status)
+      )
+    )
+    .returning()
+    .catch((error: unknown) => {
+      if (isUniqueConstraintError(error, "tokens_tenant_id_practitioner_id_date_sequence_unique")) {
+        throw new ORPCError("CONFLICT", {
+          message:
+            "Token sequence already exists for this Practitioner and date. Retry reassignment.",
+          status: 409
+        });
+      }
+
+      throw error;
+    });
 
   if (!token) {
-    throw new Error("Failed to reassign Queue token");
+    throw new ORPCError("CONFLICT", {
+      message: "Queue token changed. Reload and retry.",
+      status: 409
+    });
   }
 
   const [encounter] = await scope.tx

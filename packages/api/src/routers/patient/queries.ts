@@ -1,6 +1,7 @@
 import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 
+import { normalizePatientPhone, PATIENT_SEX_OPTIONS } from "@tsu-stack/core/patient";
 import { and, asc, desc, eq } from "@tsu-stack/db";
 import { patientIdentifiers, patients } from "@tsu-stack/db/schema";
 
@@ -19,12 +20,18 @@ export const PatientAddressSchema = z
   })
   .default({});
 
-export const PatientSexSchema = z.enum(["male", "female", "other", "unknown"]);
+export const PatientSexSchema = z.enum(PATIENT_SEX_OPTIONS);
+
+const PatientDateOfBirthSchema = z.iso
+  .date()
+  .refine((value) => value <= new Date().toISOString().slice(0, 10), {
+    message: "Date of birth cannot be in the future."
+  });
 
 const PatientDemographicsInputSchema = {
   address: PatientAddressSchema.optional(),
   ageYears: z.number().int().min(0).max(130).optional(),
-  dateOfBirth: z.iso.date().optional(),
+  dateOfBirth: PatientDateOfBirthSchema.optional(),
   fullName: z.string().trim().min(1).max(200),
   phone: z.string().trim().min(6).max(32),
   sex: PatientSexSchema.default("unknown")
@@ -82,22 +89,18 @@ export type PatientOutput = z.infer<typeof PatientOutputSchema>;
 type PatientRow = typeof patients.$inferSelect;
 type PatientIdentifierRow = typeof patientIdentifiers.$inferSelect;
 
-function normalizePhone(phone: string): string {
-  const digits = phone.replace(/\D/g, "");
-  // +91/91 and trunk-0 prefixes are the two common front-desk input habits.
-  const normalized =
-    digits.length === 12 && digits.startsWith("91")
-      ? digits.slice(2)
-      : digits.length === 11 && digits.startsWith("0")
-        ? digits.slice(1)
-        : digits;
-  if (normalized.length < 6 || normalized.length > 15) {
-    throw new ORPCError("BAD_REQUEST", {
-      message: "Phone number must contain 6 to 15 digits.",
-      status: 400
-    });
+function normalizePhoneInput(phone: string): string {
+  try {
+    return normalizePatientPhone(phone);
+  } catch (error) {
+    if (error instanceof RangeError) {
+      throw new ORPCError("BAD_REQUEST", {
+        message: error.message,
+        status: 400
+      });
+    }
+    throw error;
   }
-  return normalized;
 }
 
 function normalizeName(name: string): string {
@@ -186,7 +189,7 @@ async function findDuplicateWarnings(
 }
 
 export async function quickRegisterPatient(scope: TenantTxScope, input: PatientQuickRegisterInput) {
-  const phoneNormalized = normalizePhone(input.phone);
+  const phoneNormalized = normalizePhoneInput(input.phone);
   const duplicateWarnings = await findDuplicateWarnings(scope, {
     fullName: input.fullName,
     phoneNormalized
@@ -224,7 +227,7 @@ export async function quickRegisterPatient(scope: TenantTxScope, input: PatientQ
 }
 
 export async function searchPatientsByPhone(scope: TenantTxScope, phone: string) {
-  const phoneNormalized = normalizePhone(phone);
+  const phoneNormalized = normalizePhoneInput(phone);
   const rows = await scope.tx
     .select()
     .from(patients)

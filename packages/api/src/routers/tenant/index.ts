@@ -1,13 +1,13 @@
 import { z } from "zod";
 
-import { STAFF_ROLES } from "@tsu-stack/core/auth";
+import { STAFF_ROLES, StaffRoleSchema } from "@tsu-stack/core/auth";
 
 import { tenantProcedure } from "#@/lib/procedures/factory";
 import { TenantScopeInputSchema } from "#@/lib/tenancy/scope";
 
 const TenantMembershipOutputSchema = z.object({
   displayName: z.string(),
-  roles: z.array(z.string()),
+  roles: z.array(StaffRoleSchema),
   tenantId: z.string()
 });
 

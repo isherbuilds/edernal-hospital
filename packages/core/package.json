@@ -9,6 +9,7 @@
     ".": "./src/index.ts",
     "./audit": "./src/audit/index.ts",
     "./assets": "./src/assets/index.ts",
+    "./patient": "./src/patient/index.ts",
     "./auth": "./src/auth/index.ts",
     "./health": "./src/health/index.ts",
     "./phi": "./src/phi/index.ts",

@@ -1,5 +1,6 @@
 import {
   date,
+  foreignKey,
   index,
   integer,
   jsonb,
@@ -48,6 +49,7 @@ export const patients = pgTable(
       .notNull()
   },
   (table) => [
+    uniqueIndex("patients_tenant_id_id_unique").on(table.tenantId, table.id),
     index("patients_tenant_id_phone_normalized_idx").on(table.tenantId, table.phoneNormalized),
     index("patients_tenant_id_full_name_idx").on(table.tenantId, table.fullName)
   ]
@@ -69,6 +71,11 @@ export const patientIdentifiers = pgTable(
   },
   (table) => [
     index("patient_identifiers_tenant_id_patient_id_idx").on(table.tenantId, table.patientId),
+    foreignKey({
+      columns: [table.tenantId, table.patientId],
+      foreignColumns: [patients.tenantId, patients.id],
+      name: "patient_identifiers_tenant_id_patient_id_patients_tenant_id_id_fk"
+    }).onDelete("cascade"),
     uniqueIndex("patient_identifiers_tenant_id_system_value_unique").on(
       table.tenantId,
       table.system,
@@ -103,6 +110,22 @@ export const encounters = pgTable(
       .notNull()
   },
   (table) => [
+    uniqueIndex("encounters_tenant_id_id_unique").on(table.tenantId, table.id),
+    foreignKey({
+      columns: [table.tenantId, table.facilityId],
+      foreignColumns: [facilities.tenantId, facilities.id],
+      name: "encounters_tenant_id_facility_id_facilities_tenant_id_id_fk"
+    }).onDelete("restrict"),
+    foreignKey({
+      columns: [table.tenantId, table.patientId],
+      foreignColumns: [patients.tenantId, patients.id],
+      name: "encounters_tenant_id_patient_id_patients_tenant_id_id_fk"
+    }).onDelete("restrict"),
+    foreignKey({
+      columns: [table.tenantId, table.practitionerId],
+      foreignColumns: [practitioners.tenantId, practitioners.id],
+      name: "encounters_tenant_id_practitioner_id_practitioners_tenant_id_id_fk"
+    }).onDelete("restrict"),
     index("encounters_tenant_id_patient_id_idx").on(table.tenantId, table.patientId),
     index("encounters_tenant_id_practitioner_id_status_idx").on(
       table.tenantId,
@@ -142,6 +165,26 @@ export const tokens = pgTable(
   },
   (table) => [
     uniqueIndex("tokens_tenant_id_encounter_id_unique").on(table.tenantId, table.encounterId),
+    foreignKey({
+      columns: [table.tenantId, table.encounterId],
+      foreignColumns: [encounters.tenantId, encounters.id],
+      name: "tokens_tenant_id_encounter_id_encounters_tenant_id_id_fk"
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.tenantId, table.facilityId],
+      foreignColumns: [facilities.tenantId, facilities.id],
+      name: "tokens_tenant_id_facility_id_facilities_tenant_id_id_fk"
+    }).onDelete("restrict"),
+    foreignKey({
+      columns: [table.tenantId, table.patientId],
+      foreignColumns: [patients.tenantId, patients.id],
+      name: "tokens_tenant_id_patient_id_patients_tenant_id_id_fk"
+    }).onDelete("restrict"),
+    foreignKey({
+      columns: [table.tenantId, table.practitionerId],
+      foreignColumns: [practitioners.tenantId, practitioners.id],
+      name: "tokens_tenant_id_practitioner_id_practitioners_tenant_id_id_fk"
+    }).onDelete("restrict"),
     uniqueIndex("tokens_tenant_id_practitioner_id_date_sequence_unique").on(
       table.tenantId,
       table.practitionerId,

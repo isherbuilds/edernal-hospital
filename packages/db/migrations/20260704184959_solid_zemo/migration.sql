@@ -51,12 +51,16 @@ CREATE TABLE "tokens" (
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE UNIQUE INDEX "facilities_tenant_id_id_unique" ON "facilities" ("tenant_id","id");--> statement-breakpoint
+CREATE UNIQUE INDEX "practitioners_tenant_id_id_unique" ON "practitioners" ("tenant_id","id");--> statement-breakpoint
 CREATE INDEX "encounters_tenant_id_patient_id_idx" ON "encounters" ("tenant_id","patient_id");--> statement-breakpoint
 CREATE INDEX "encounters_tenant_id_practitioner_id_status_idx" ON "encounters" ("tenant_id","practitioner_id","status");--> statement-breakpoint
 CREATE INDEX "patient_identifiers_tenant_id_patient_id_idx" ON "patient_identifiers" ("tenant_id","patient_id");--> statement-breakpoint
 CREATE UNIQUE INDEX "patient_identifiers_tenant_id_system_value_unique" ON "patient_identifiers" ("tenant_id","system","value");--> statement-breakpoint
+CREATE UNIQUE INDEX "patients_tenant_id_id_unique" ON "patients" ("tenant_id","id");--> statement-breakpoint
 CREATE INDEX "patients_tenant_id_phone_normalized_idx" ON "patients" ("tenant_id","phone_normalized");--> statement-breakpoint
 CREATE INDEX "patients_tenant_id_full_name_idx" ON "patients" ("tenant_id","full_name");--> statement-breakpoint
+CREATE UNIQUE INDEX "encounters_tenant_id_id_unique" ON "encounters" ("tenant_id","id");--> statement-breakpoint
 CREATE UNIQUE INDEX "tokens_tenant_id_encounter_id_unique" ON "tokens" ("tenant_id","encounter_id");--> statement-breakpoint
 CREATE UNIQUE INDEX "tokens_tenant_id_practitioner_id_date_sequence_unique" ON "tokens" ("tenant_id","practitioner_id","token_date","sequence");--> statement-breakpoint
 CREATE INDEX "tokens_tenant_id_facility_id_date_status_idx" ON "tokens" ("tenant_id","facility_id","token_date","status");--> statement-breakpoint
@@ -72,4 +76,12 @@ ALTER TABLE "tokens" ADD CONSTRAINT "tokens_encounter_id_encounters_id_fkey" FOR
 ALTER TABLE "tokens" ADD CONSTRAINT "tokens_facility_id_facilities_id_fkey" FOREIGN KEY ("facility_id") REFERENCES "facilities"("id") ON DELETE RESTRICT;--> statement-breakpoint
 ALTER TABLE "tokens" ADD CONSTRAINT "tokens_patient_id_patients_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "patients"("id") ON DELETE RESTRICT;--> statement-breakpoint
 ALTER TABLE "tokens" ADD CONSTRAINT "tokens_practitioner_id_practitioners_id_fkey" FOREIGN KEY ("practitioner_id") REFERENCES "practitioners"("id") ON DELETE RESTRICT;--> statement-breakpoint
-ALTER TABLE "tokens" ADD CONSTRAINT "tokens_tenant_id_organization_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "organization"("id") ON DELETE RESTRICT;
+ALTER TABLE "tokens" ADD CONSTRAINT "tokens_tenant_id_organization_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "organization"("id") ON DELETE RESTRICT;--> statement-breakpoint
+ALTER TABLE "patient_identifiers" ADD CONSTRAINT "patient_identifiers_tenant_id_patient_id_patients_tenant_id_id_fk" FOREIGN KEY ("tenant_id","patient_id") REFERENCES "patients"("tenant_id","id") ON DELETE CASCADE;--> statement-breakpoint
+ALTER TABLE "encounters" ADD CONSTRAINT "encounters_tenant_id_facility_id_facilities_tenant_id_id_fk" FOREIGN KEY ("tenant_id","facility_id") REFERENCES "facilities"("tenant_id","id") ON DELETE RESTRICT;--> statement-breakpoint
+ALTER TABLE "encounters" ADD CONSTRAINT "encounters_tenant_id_patient_id_patients_tenant_id_id_fk" FOREIGN KEY ("tenant_id","patient_id") REFERENCES "patients"("tenant_id","id") ON DELETE RESTRICT;--> statement-breakpoint
+ALTER TABLE "encounters" ADD CONSTRAINT "encounters_tenant_id_practitioner_id_practitioners_tenant_id_id_fk" FOREIGN KEY ("tenant_id","practitioner_id") REFERENCES "practitioners"("tenant_id","id") ON DELETE RESTRICT;--> statement-breakpoint
+ALTER TABLE "tokens" ADD CONSTRAINT "tokens_tenant_id_encounter_id_encounters_tenant_id_id_fk" FOREIGN KEY ("tenant_id","encounter_id") REFERENCES "encounters"("tenant_id","id") ON DELETE CASCADE;--> statement-breakpoint
+ALTER TABLE "tokens" ADD CONSTRAINT "tokens_tenant_id_facility_id_facilities_tenant_id_id_fk" FOREIGN KEY ("tenant_id","facility_id") REFERENCES "facilities"("tenant_id","id") ON DELETE RESTRICT;--> statement-breakpoint
+ALTER TABLE "tokens" ADD CONSTRAINT "tokens_tenant_id_patient_id_patients_tenant_id_id_fk" FOREIGN KEY ("tenant_id","patient_id") REFERENCES "patients"("tenant_id","id") ON DELETE RESTRICT;--> statement-breakpoint
+ALTER TABLE "tokens" ADD CONSTRAINT "tokens_tenant_id_practitioner_id_practitioners_tenant_id_id_fk" FOREIGN KEY ("tenant_id","practitioner_id") REFERENCES "practitioners"("tenant_id","id") ON DELETE RESTRICT;

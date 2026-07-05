@@ -3,6 +3,7 @@ import process from "node:process";
 
 import { auth } from "@tsu-stack/auth/index";
 import { type StaffRole } from "@tsu-stack/core/auth";
+import { normalizePatientPhone } from "@tsu-stack/core/patient";
 import { and, closeDb, db, eq } from "@tsu-stack/db";
 import {
   encounters,
@@ -367,19 +368,8 @@ async function ensurePractitioner(input: {
   return created;
 }
 
-function normalizeSeedPhone(phone: string) {
-  const digits = phone.replace(/\D/g, "");
-  if (digits.length === 12 && digits.startsWith("91")) {
-    return digits.slice(2);
-  }
-  if (digits.length === 11 && digits.startsWith("0")) {
-    return digits.slice(1);
-  }
-  return digits;
-}
-
 async function ensurePatient(tenantId: string, seed: SeedPatient) {
-  const phoneNormalized = normalizeSeedPhone(seed.phone);
+  const phoneNormalized = normalizePatientPhone(seed.phone);
   const [existing] = await db
     .select()
     .from(patients)
@@ -432,40 +422,42 @@ async function ensureSeedToken(input: {
     return existing;
   }
 
-  const [encounter] = await db
-    .insert(encounters)
-    .values({
-      facilityId: input.facilityId,
-      patientId: input.patientId,
-      practitionerId: input.practitionerId,
-      status: "planned",
-      tenantId: input.tenantId
-    })
-    .returning();
+  return db.transaction(async (tx) => {
+    const [encounter] = await tx
+      .insert(encounters)
+      .values({
+        facilityId: input.facilityId,
+        patientId: input.patientId,
+        practitionerId: input.practitionerId,
+        status: "planned",
+        tenantId: input.tenantId
+      })
+      .returning();
 
-  if (!encounter) {
-    throw new Error("Failed to create seed Encounter");
-  }
+    if (!encounter) {
+      throw new Error("Failed to create seed Encounter");
+    }
 
-  const [token] = await db
-    .insert(tokens)
-    .values({
-      encounterId: encounter.id,
-      facilityId: input.facilityId,
-      patientId: input.patientId,
-      practitionerId: input.practitionerId,
-      sequence: input.sequence,
-      status: "waiting",
-      tenantId: input.tenantId,
-      tokenDate: input.tokenDate
-    })
-    .returning();
+    const [token] = await tx
+      .insert(tokens)
+      .values({
+        encounterId: encounter.id,
+        facilityId: input.facilityId,
+        patientId: input.patientId,
+        practitionerId: input.practitionerId,
+        sequence: input.sequence,
+        status: "waiting",
+        tenantId: input.tenantId,
+        tokenDate: input.tokenDate
+      })
+      .returning();
 
-  if (!token) {
-    throw new Error("Failed to create seed Queue token");
-  }
+    if (!token) {
+      throw new Error("Failed to create seed Queue token");
+    }
 
-  return token;
+    return token;
+  });
 }
 async function main() {
   if (ENV_SERVER.NODE_ENV === "production" && process.env.ALLOW_PRODUCTION_SEED !== "true") {

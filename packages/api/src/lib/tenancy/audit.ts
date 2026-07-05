@@ -13,15 +13,6 @@ type AuditInput = {
 
 type AuditReadInput = Omit<AuditInput, "action"> & {
   resultCount: number;
-  /**
-   * Suppresses repeat read/search events for the same actor + procedure +
-   * resource within the window. Intended for polling endpoints (queue board)
-   * whose steady-state traffic would otherwise drown the audit trail.
-   * Tracking is in-memory per process, so restarts fail open to MORE events,
-   * never fewer. Decision dated 2026-07-04; revisit at the Phase 4 Trust
-   * Envelope audit.
-   */
-  throttleMs?: number;
 };
 
 type AuditRecord = Required<
@@ -38,33 +29,7 @@ export type TenantAudit = {
 export type CreateTenantAuditOptions = {
   insert: (record: AuditRecord) => Promise<void>;
   procedure: string;
-  /** Stable actor identity (tenant + user) keying read/search throttling. */
-  throttleScope?: string;
 };
-
-const THROTTLE_MAP_MAX_ENTRIES = 4096;
-
-/** Maps throttle key to the epoch-ms timestamp when suppression expires. */
-const throttleExpiry = new Map<string, number>();
-
-function shouldSkipThrottled(key: string, windowMs: number): boolean {
-  const now = Date.now();
-  const expiresAt = throttleExpiry.get(key);
-  if (expiresAt !== undefined && now < expiresAt) {
-    return true;
-  }
-
-  if (throttleExpiry.size >= THROTTLE_MAP_MAX_ENTRIES) {
-    for (const [entryKey, entryExpiresAt] of throttleExpiry) {
-      if (entryExpiresAt <= now) {
-        throttleExpiry.delete(entryKey);
-      }
-    }
-  }
-
-  throttleExpiry.set(key, now + windowMs);
-  return false;
-}
 
 function addProcedureDetails(procedure: string, details?: AuditDetails): AuditDetails {
   return {
@@ -83,11 +48,7 @@ function redactAuditDetails(details: AuditDetails): AuditDetails {
   return redacted;
 }
 
-export function createTenantAudit({
-  insert,
-  procedure,
-  throttleScope
-}: CreateTenantAuditOptions): TenantAudit {
+export function createTenantAudit({ insert, procedure }: CreateTenantAuditOptions): TenantAudit {
   function record(input: AuditInput) {
     return insert({
       action: input.action,
@@ -99,13 +60,6 @@ export function createTenantAudit({
   }
 
   function recordRead(action: "read" | "search", input: AuditReadInput) {
-    if (input.throttleMs) {
-      const key = `${throttleScope ?? ""}:${procedure}:${action}:${input.resourceType}:${input.resourceId ?? ""}`;
-      if (shouldSkipThrottled(key, input.throttleMs)) {
-        return Promise.resolve();
-      }
-    }
-
     return record({
       ...input,
       action,

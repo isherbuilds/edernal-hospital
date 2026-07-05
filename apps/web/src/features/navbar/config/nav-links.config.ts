@@ -16,7 +16,7 @@ export const navLinks: NavbarLink[] = [
     to: "/dashboard"
   },
   {
-    label: () => "Front desk",
+    label: () => m.navbar__front_desk(),
     to: "/front-desk"
   },
   {

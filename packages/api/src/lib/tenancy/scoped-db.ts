@@ -30,8 +30,7 @@ export function withTenantTx<T>(
           tenantId: context.tenant.id
         });
       },
-      procedure,
-      throttleScope: `${context.tenant.id}:${context.session.user.id}`
+      procedure
     });
 
     return execute({

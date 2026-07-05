@@ -42,6 +42,7 @@
   "error_500__try_again": "Erneut versuchen",
   "navbar__playground": "Spielwiese",
   "navbar__dashboard": "Dashboard",
+  "navbar__front_desk": "Empfang",
   "navbar__api_docs": "API-Dokumentation",
   "navbar__sign_in": "Anmelden",
   "navbar__get_started": "Loslegen",

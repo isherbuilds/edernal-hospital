@@ -49,9 +49,9 @@ export const relations = defineRelations(schema, (r) => {
         to: r.organization.id
       }),
       token: r.one.tokens({
-        from: r.encounters.id,
+        from: [r.encounters.tenantId, r.encounters.id],
         optional: true,
-        to: r.tokens.encounterId
+        to: [r.tokens.tenantId, r.tokens.encounterId]
       })
     },
     patientIdentifiers: {
@@ -95,8 +95,8 @@ export const relations = defineRelations(schema, (r) => {
     },
     tokens: {
       encounter: r.one.encounters({
-        from: r.tokens.encounterId,
-        to: r.encounters.id
+        from: [r.tokens.tenantId, r.tokens.encounterId],
+        to: [r.encounters.tenantId, r.encounters.id]
       }),
       facility: r.one.facilities({
         from: r.tokens.facilityId,

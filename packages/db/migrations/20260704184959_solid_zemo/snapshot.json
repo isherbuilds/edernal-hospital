@@ -3039,6 +3039,270 @@
       "schema": "public",
       "table": "user",
       "entityType": "uniques"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "tenant_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "facilities_tenant_id_id_unique",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "facilities"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "tenant_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "practitioners_tenant_id_id_unique",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "practitioners"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "tenant_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "patients_tenant_id_id_unique",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "patients"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "tenant_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "encounters_tenant_id_id_unique",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "encounters"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "tenant_id",
+        "patient_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "patients",
+      "columnsTo": [
+        "tenant_id",
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "patient_identifiers_tenant_id_patient_id_patients_tenant_id_id_fk",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "patient_identifiers"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "tenant_id",
+        "facility_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "facilities",
+      "columnsTo": [
+        "tenant_id",
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "name": "encounters_tenant_id_facility_id_facilities_tenant_id_id_fk",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "encounters"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "tenant_id",
+        "patient_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "patients",
+      "columnsTo": [
+        "tenant_id",
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "name": "encounters_tenant_id_patient_id_patients_tenant_id_id_fk",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "encounters"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "tenant_id",
+        "practitioner_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "practitioners",
+      "columnsTo": [
+        "tenant_id",
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "name": "encounters_tenant_id_practitioner_id_practitioners_tenant_id_id_fk",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "encounters"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "tenant_id",
+        "encounter_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "encounters",
+      "columnsTo": [
+        "tenant_id",
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "tokens_tenant_id_encounter_id_encounters_tenant_id_id_fk",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "tokens"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "tenant_id",
+        "facility_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "facilities",
+      "columnsTo": [
+        "tenant_id",
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "name": "tokens_tenant_id_facility_id_facilities_tenant_id_id_fk",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "tokens"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "tenant_id",
+        "patient_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "patients",
+      "columnsTo": [
+        "tenant_id",
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "name": "tokens_tenant_id_patient_id_patients_tenant_id_id_fk",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "tokens"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "tenant_id",
+        "practitioner_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "practitioners",
+      "columnsTo": [
+        "tenant_id",
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "name": "tokens_tenant_id_practitioner_id_practitioners_tenant_id_id_fk",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "tokens"
     }
   ],
   "renames": []

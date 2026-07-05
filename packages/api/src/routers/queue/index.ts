@@ -28,6 +28,10 @@ const queueReaderRoles = [
 const queueManagerRoles = [STAFF_ROLE.FRONT_DESK, STAFF_ROLE.HOSPITAL_ADMIN] as const;
 const CHECK_IN_SEQUENCE_ATTEMPTS = 3;
 
+const QueueManagerStatusInputSchema = QueueTokenStatusInputSchema.extend({
+  status: z.enum(["waiting", "done", "skipped"])
+});
+
 export const queueRouter = {
   board: tenantProcedure(QueueListInputSchema, queueReaderRoles)
     .route({
@@ -102,7 +106,7 @@ export const queueRouter = {
         updateTokenStatus(scope, { ...input, status: "in_consult" })
       )
     ),
-  updateStatus: tenantProcedure(QueueTokenStatusInputSchema, queueManagerRoles)
+  updateStatus: tenantProcedure(QueueManagerStatusInputSchema, queueManagerRoles)
     .route({
       description: "Update Queue token status for front-desk queue management",
       method: "POST"

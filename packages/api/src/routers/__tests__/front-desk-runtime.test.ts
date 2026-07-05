@@ -309,6 +309,26 @@ describeWithDb("front desk runtime", () => {
     );
   });
 
+  it("rejects quick-registering a patient with a future date of birth", async () => {
+    expect.assertions(1);
+    const fixture = await createTenantFixture();
+
+    await expectOrpcCode(
+      call(
+        patientRouter.quickRegister,
+        {
+          dateOfBirth: "2999-01-01",
+          fullName: "Future Born",
+          phone: "9876500000",
+          sex: "unknown",
+          tenantId: fixture.organizationId
+        },
+        { context: contextFor(fixture) }
+      ),
+      "BAD_REQUEST"
+    );
+  });
+
   it("normalizes trunk-zero Indian phone numbers before duplicate checks and search", async () => {
     const fixture = await createTenantFixture();
     const context = contextFor(fixture);
@@ -396,7 +416,7 @@ describeWithDb("front desk runtime", () => {
       },
       { context }
     );
-    const throttledBoard = await call(
+    const repeatedBoard = await call(
       queueRouter.board,
       {
         facilityId: fixture.facilityId,
@@ -438,7 +458,7 @@ describeWithDb("front desk runtime", () => {
     expect(checkIn.token.status).toBe("waiting");
     expect(checkIn.token.tokenDate).toBe(tokenDate);
     expect(board.map((token) => token.id)).toEqual([checkIn.token.id]);
-    expect(throttledBoard.map((token) => token.id)).toEqual([checkIn.token.id]);
+    expect(repeatedBoard.map((token) => token.id)).toEqual([checkIn.token.id]);
     expect(practitionerDay.map((token) => token.id)).toEqual([checkIn.token.id]);
     expect(inConsult.status).toBe("in_consult");
     expect(done.status).toBe("done");
@@ -466,7 +486,7 @@ describeWithDb("front desk runtime", () => {
         audit.resourceType === "patient" &&
         auditDetailProcedure(audit.details) === "queue.board"
     );
-    expect(boardSearchAudits).toHaveLength(1);
+    expect(boardSearchAudits).toHaveLength(2);
     expect(patientSurfaceBoardAudits).toEqual([]);
 
     expect(audits).toEqual(
@@ -528,6 +548,62 @@ describeWithDb("front desk runtime", () => {
         })
       ])
     );
+  });
+
+  it("rejects moving a waiting token into consult through front-desk status updates", async () => {
+    const fixture = await createTenantFixture();
+    const context = contextFor(fixture);
+    const patient = await call(
+      patientRouter.quickRegister,
+      {
+        ageYears: 38,
+        fullName: "Arjun Iyer",
+        phone: "9999990002",
+        sex: "male",
+        tenantId: fixture.organizationId
+      },
+      { context }
+    );
+    const checkIn = await call(
+      queueRouter.checkIn,
+      {
+        facilityId: fixture.facilityId,
+        patientId: patient.id,
+        practitionerId: fixture.practitionerId,
+        tenantId: fixture.organizationId
+      },
+      { context }
+    );
+
+    const untypedClientStatus = "in_consult" as never;
+    await expectOrpcCode(
+      call(
+        queueRouter.updateStatus,
+        {
+          status: untypedClientStatus,
+          tenantId: fixture.organizationId,
+          tokenId: checkIn.token.id
+        },
+        { context }
+      ),
+      "BAD_REQUEST"
+    );
+
+    const board = await call(
+      queueRouter.board,
+      {
+        facilityId: fixture.facilityId,
+        tenantId: fixture.organizationId
+      },
+      { context }
+    );
+
+    expect(board).toEqual([
+      expect.objectContaining({
+        id: checkIn.token.id,
+        status: "waiting"
+      })
+    ]);
   });
 
   it("treats updating a token to its current status as a read", async () => {
