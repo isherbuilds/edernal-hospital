@@ -2513,57 +2513,6 @@
     {
       "nameExplicit": false,
       "columns": [
-        "facility_id"
-      ],
-      "schemaTo": "public",
-      "tableTo": "facilities",
-      "columnsTo": [
-        "id"
-      ],
-      "onUpdate": "NO ACTION",
-      "onDelete": "RESTRICT",
-      "name": "encounters_facility_id_facilities_id_fkey",
-      "entityType": "fks",
-      "schema": "public",
-      "table": "encounters"
-    },
-    {
-      "nameExplicit": false,
-      "columns": [
-        "patient_id"
-      ],
-      "schemaTo": "public",
-      "tableTo": "patients",
-      "columnsTo": [
-        "id"
-      ],
-      "onUpdate": "NO ACTION",
-      "onDelete": "RESTRICT",
-      "name": "encounters_patient_id_patients_id_fkey",
-      "entityType": "fks",
-      "schema": "public",
-      "table": "encounters"
-    },
-    {
-      "nameExplicit": false,
-      "columns": [
-        "practitioner_id"
-      ],
-      "schemaTo": "public",
-      "tableTo": "practitioners",
-      "columnsTo": [
-        "id"
-      ],
-      "onUpdate": "NO ACTION",
-      "onDelete": "RESTRICT",
-      "name": "encounters_practitioner_id_practitioners_id_fkey",
-      "entityType": "fks",
-      "schema": "public",
-      "table": "encounters"
-    },
-    {
-      "nameExplicit": false,
-      "columns": [
         "tenant_id"
       ],
       "schemaTo": "public",
@@ -2666,23 +2615,6 @@
     {
       "nameExplicit": false,
       "columns": [
-        "patient_id"
-      ],
-      "schemaTo": "public",
-      "tableTo": "patients",
-      "columnsTo": [
-        "id"
-      ],
-      "onUpdate": "NO ACTION",
-      "onDelete": "CASCADE",
-      "name": "patient_identifiers_patient_id_patients_id_fkey",
-      "entityType": "fks",
-      "schema": "public",
-      "table": "patient_identifiers"
-    },
-    {
-      "nameExplicit": false,
-      "columns": [
         "tenant_id"
       ],
       "schemaTo": "public",
@@ -2781,74 +2713,6 @@
       "entityType": "fks",
       "schema": "public",
       "table": "session"
-    },
-    {
-      "nameExplicit": false,
-      "columns": [
-        "encounter_id"
-      ],
-      "schemaTo": "public",
-      "tableTo": "encounters",
-      "columnsTo": [
-        "id"
-      ],
-      "onUpdate": "NO ACTION",
-      "onDelete": "CASCADE",
-      "name": "tokens_encounter_id_encounters_id_fkey",
-      "entityType": "fks",
-      "schema": "public",
-      "table": "tokens"
-    },
-    {
-      "nameExplicit": false,
-      "columns": [
-        "facility_id"
-      ],
-      "schemaTo": "public",
-      "tableTo": "facilities",
-      "columnsTo": [
-        "id"
-      ],
-      "onUpdate": "NO ACTION",
-      "onDelete": "RESTRICT",
-      "name": "tokens_facility_id_facilities_id_fkey",
-      "entityType": "fks",
-      "schema": "public",
-      "table": "tokens"
-    },
-    {
-      "nameExplicit": false,
-      "columns": [
-        "patient_id"
-      ],
-      "schemaTo": "public",
-      "tableTo": "patients",
-      "columnsTo": [
-        "id"
-      ],
-      "onUpdate": "NO ACTION",
-      "onDelete": "RESTRICT",
-      "name": "tokens_patient_id_patients_id_fkey",
-      "entityType": "fks",
-      "schema": "public",
-      "table": "tokens"
-    },
-    {
-      "nameExplicit": false,
-      "columns": [
-        "practitioner_id"
-      ],
-      "schemaTo": "public",
-      "tableTo": "practitioners",
-      "columnsTo": [
-        "id"
-      ],
-      "onUpdate": "NO ACTION",
-      "onDelete": "RESTRICT",
-      "name": "tokens_practitioner_id_practitioners_id_fkey",
-      "entityType": "fks",
-      "schema": "public",
-      "table": "tokens"
     },
     {
       "nameExplicit": false,

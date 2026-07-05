@@ -398,7 +398,9 @@ export async function updateTokenStatus(
       and(
         eq(tokens.tenantId, scope.tenantId),
         eq(tokens.id, input.tokenId),
-        eq(tokens.status, currentToken.status)
+        eq(tokens.status, currentToken.status),
+        eq(tokens.practitionerId, currentToken.practitionerId),
+        eq(tokens.sequence, currentToken.sequence)
       )
     )
     .returning();
@@ -482,7 +484,9 @@ export async function reassignToken(
       and(
         eq(tokens.tenantId, scope.tenantId),
         eq(tokens.id, input.tokenId),
-        eq(tokens.status, current.status)
+        eq(tokens.status, current.status),
+        eq(tokens.practitionerId, current.practitionerId),
+        eq(tokens.sequence, current.sequence)
       )
     )
     .returning()

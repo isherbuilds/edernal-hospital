@@ -60,9 +60,7 @@ export const patientIdentifiers = pgTable(
   {
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     id: uuid("id").defaultRandom().primaryKey(),
-    patientId: uuid("patient_id")
-      .notNull()
-      .references(() => patients.id, { onDelete: "cascade" }),
+    patientId: uuid("patient_id").notNull(),
     system: text("system").notNull(),
     tenantId: text("tenant_id")
       .notNull()
@@ -88,17 +86,11 @@ export const encounters = pgTable(
   "encounters",
   {
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-    facilityId: uuid("facility_id")
-      .notNull()
-      .references(() => facilities.id, { onDelete: "restrict" }),
+    facilityId: uuid("facility_id").notNull(),
     finishedAt: timestamp("finished_at", { withTimezone: true }),
     id: uuid("id").defaultRandom().primaryKey(),
-    patientId: uuid("patient_id")
-      .notNull()
-      .references(() => patients.id, { onDelete: "restrict" }),
-    practitionerId: uuid("practitioner_id")
-      .notNull()
-      .references(() => practitioners.id, { onDelete: "restrict" }),
+    patientId: uuid("patient_id").notNull(),
+    practitionerId: uuid("practitioner_id").notNull(),
     startedAt: timestamp("started_at", { withTimezone: true }),
     status: encounterStatus("status").default("planned").notNull(),
     tenantId: text("tenant_id")
@@ -139,19 +131,11 @@ export const tokens = pgTable(
   "tokens",
   {
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-    encounterId: uuid("encounter_id")
-      .notNull()
-      .references(() => encounters.id, { onDelete: "cascade" }),
-    facilityId: uuid("facility_id")
-      .notNull()
-      .references(() => facilities.id, { onDelete: "restrict" }),
+    encounterId: uuid("encounter_id").notNull(),
+    facilityId: uuid("facility_id").notNull(),
     id: uuid("id").defaultRandom().primaryKey(),
-    patientId: uuid("patient_id")
-      .notNull()
-      .references(() => patients.id, { onDelete: "restrict" }),
-    practitionerId: uuid("practitioner_id")
-      .notNull()
-      .references(() => practitioners.id, { onDelete: "restrict" }),
+    patientId: uuid("patient_id").notNull(),
+    practitionerId: uuid("practitioner_id").notNull(),
     sequence: integer("sequence").notNull(),
     status: tokenStatus("status").default("waiting").notNull(),
     tenantId: text("tenant_id")

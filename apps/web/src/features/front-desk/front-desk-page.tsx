@@ -272,7 +272,7 @@ export function FrontDeskPage() {
       setSelectedPatient(patient);
       setPhoneSearch(patient.phone);
       try {
-        await duplicateCheck.mutateAsync({ phone: patient.phone, tenantId });
+        await patientSearch.mutateAsync({ phone: patient.phone, tenantId });
       } catch {
         // Registration already succeeded; do not report a refresh failure as a registration failure.
       }
@@ -776,7 +776,7 @@ export function FrontDeskPage() {
                   <Button
                     key={practitioner.id}
                     type="button"
-                    variant={selectedPractitionerId === practitioner.id ? "default" : "outline"}
+                    variant={defaultPractitionerId === practitioner.id ? "default" : "outline"}
                     onClick={() => setSelectedPractitionerId(practitioner.id)}
                   >
                     {practitioner.displayName}
