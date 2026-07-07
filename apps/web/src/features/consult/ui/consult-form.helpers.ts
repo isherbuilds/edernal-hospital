@@ -186,7 +186,7 @@ export function buildPrescriptionLines(
     const parsedLine = prescriptionLineSchema.safeParse({
       dose: line.dose,
       duration: line.duration,
-      formularyItemId: line.formularyItemId,
+      formularyItemId: line.formularyItemId === "" ? undefined : line.formularyItemId,
       frequency: line.frequency,
       instructions: line.instructions,
       medicationText: line.medicationText

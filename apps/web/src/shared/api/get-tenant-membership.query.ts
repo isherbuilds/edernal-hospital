@@ -1,10 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { orpc } from "@tsu-stack/api/client/tanstack-start/orpc";
+import { type TenantMembershipOutput } from "@tsu-stack/api/routers/tenant/index";
 
 export type TenantMembershipQueryInput = {
   tenantId: string;
 };
+
+export type TenantMembershipQueryResult = TenantMembershipOutput;
 
 export const tenantMembershipQueryKeys = {
   byTenant(tenantId: string) {

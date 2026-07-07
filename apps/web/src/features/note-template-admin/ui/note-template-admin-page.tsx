@@ -274,11 +274,37 @@ export function NoteTemplateAdminPage() {
 
     try {
       if (editingTemplate) {
-        await updateNoteTemplate.mutateAsync({
-          ...input,
-          noteTemplateId: editingTemplate.id
-        });
-        toast.success("Note template updated.");
+        const changes: Partial<NoteTemplateFormState> = {};
+        if (input.name !== editingTemplate.name) {
+          changes.name = input.name;
+        }
+        if (input.specialty !== (editingTemplate.specialty ?? "")) {
+          changes.specialty = input.specialty;
+        }
+        if (input.complaints !== editingTemplate.complaints) {
+          changes.complaints = input.complaints;
+        }
+        if (input.findings !== editingTemplate.findings) {
+          changes.findings = input.findings;
+        }
+        if (input.diagnosisText !== editingTemplate.diagnosisText) {
+          changes.diagnosisText = input.diagnosisText;
+        }
+        if (input.advice !== editingTemplate.advice) {
+          changes.advice = input.advice;
+        }
+        if (input.followUp !== editingTemplate.followUp) {
+          changes.followUp = input.followUp;
+        }
+
+        if (Object.keys(changes).length > 0) {
+          await updateNoteTemplate.mutateAsync({
+            ...changes,
+            noteTemplateId: editingTemplate.id,
+            tenantId
+          });
+          toast.success("Note template updated.");
+        }
       } else {
         await createNoteTemplate.mutateAsync(input);
         toast.success("Note template created.");
@@ -355,7 +381,7 @@ export function NoteTemplateAdminPage() {
       ) : !canManageTemplates ? (
         <Empty>
           <EmptyHeader>
-            <EmptyTitle>not allowed</EmptyTitle>
+            <EmptyTitle>Not allowed</EmptyTitle>
             <EmptyDescription>
               Note template administration requires the hospital admin role for this organization.
             </EmptyDescription>
@@ -402,7 +428,7 @@ export function NoteTemplateAdminPage() {
                     return (
                       <TableRow key={template.id}>
                         <TableCell className="font-medium">{template.name}</TableCell>
-                        <TableCell>{template.specialty ?? "General"}</TableCell>
+                        <TableCell>{(template.specialty ?? "") || "General"}</TableCell>
                         <TableCell>
                           <Badge variant={template.status === "active" ? "secondary" : "outline"}>
                             {statusLabel}

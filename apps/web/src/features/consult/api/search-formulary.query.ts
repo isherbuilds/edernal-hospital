@@ -47,7 +47,7 @@ export function useSearchFormularyQuery({
   tenantId
 }: FormularySearchQueryInput & { delayMs?: number; enabled?: boolean }) {
   const debouncedQuery = useDebouncedText(query.trim(), delayMs);
-  const canSearch = enabled && tenantId.trim().length > 0 && debouncedQuery.length >= 2;
+  const canSearch = enabled && tenantId.length > 0 && debouncedQuery.length >= 2;
 
   return useQuery({
     ...searchFormularyQueryOptions({ query: debouncedQuery, tenantId }),

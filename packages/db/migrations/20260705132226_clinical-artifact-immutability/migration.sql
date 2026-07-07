@@ -37,7 +37,8 @@ BEGIN
 	IF TG_OP IN ('UPDATE', 'DELETE') THEN
 		SELECT status INTO parent_status
 		FROM prescriptions
-		WHERE tenant_id = OLD.tenant_id AND id = OLD.prescription_id;
+		WHERE tenant_id = OLD.tenant_id AND id = OLD.prescription_id
+		FOR UPDATE;
 
 		IF parent_status IN ('signed', 'superseded') THEN
 			RAISE EXCEPTION 'prescription_lines cannot be mutated when parent prescription is signed or superseded';
@@ -47,7 +48,8 @@ BEGIN
 	IF TG_OP IN ('INSERT', 'UPDATE') THEN
 		SELECT status INTO parent_status
 		FROM prescriptions
-		WHERE tenant_id = NEW.tenant_id AND id = NEW.prescription_id;
+		WHERE tenant_id = NEW.tenant_id AND id = NEW.prescription_id
+		FOR UPDATE;
 
 		IF parent_status IN ('signed', 'superseded') THEN
 			RAISE EXCEPTION 'prescription_lines cannot be mutated when parent prescription is signed or superseded';

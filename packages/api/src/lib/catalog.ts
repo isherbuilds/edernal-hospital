@@ -21,12 +21,14 @@ export type CatalogUpdatePlan = {
 };
 
 /**
- * Derive the write patch AND the optimistic-lock guard from a single field list.
+ * Derive the write patch AND the guard from a single field list.
  *
  * Because both come from the same list, every editable column is also part of the
- * stale-write guard — an update only lands if nothing changed since the caller read the
- * row, so a concurrent edit can never be silently clobbered (the bug class where a column
- * was writable but missing from the guard).
+ * guard — the UPDATE only lands if the row still matches the values just read in this
+ * transaction, closing the server read→write race (the bug class where a column was
+ * writable but missing from the guard). This is NOT full optimistic concurrency: it does
+ * not compare against the client's edit-dialog baseline, so callers reduce the
+ * lost-update window by sending sparse patches of only the fields they changed.
  */
 export function planCatalogUpdate<TRow>(
   fields: ReadonlyArray<CatalogField<TRow>>,

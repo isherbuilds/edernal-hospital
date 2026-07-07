@@ -6,11 +6,11 @@ export function getErrorMessage<TError>(
   definedErrorMessages: Partial<Record<string, string>> = {}
 ) {
   if (isDefinedError(error)) {
-    return error.message ?? definedErrorMessages[error.code] ?? fallback;
+    return definedErrorMessages[error.code] ?? error.message ?? fallback;
   }
 
   if (error instanceof ORPCError) {
-    return error.message ?? definedErrorMessages[error.code] ?? fallback;
+    return definedErrorMessages[error.code] ?? error.message ?? fallback;
   }
 
   if (error instanceof Error && error.message.length > 0) {

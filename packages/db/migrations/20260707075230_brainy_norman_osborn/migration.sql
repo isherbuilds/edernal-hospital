@@ -1,0 +1,2 @@
+ALTER TABLE "consult_notes" ADD CONSTRAINT "consult_notes_signed_metadata_check" CHECK (("status" = 'preliminary' AND "signed_at" IS NULL AND "signed_by_user_id" IS NULL) OR ("status" IN ('signed', 'superseded') AND "signed_at" IS NOT NULL AND "signed_by_user_id" IS NOT NULL));--> statement-breakpoint
+ALTER TABLE "prescriptions" ADD CONSTRAINT "prescriptions_signed_metadata_check" CHECK (("status" = 'preliminary' AND "signed_at" IS NULL AND "signed_by_user_id" IS NULL) OR ("status" IN ('signed', 'superseded') AND "signed_at" IS NOT NULL AND "signed_by_user_id" IS NOT NULL));

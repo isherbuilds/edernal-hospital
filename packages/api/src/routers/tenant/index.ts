@@ -5,11 +5,12 @@ import { STAFF_ROLES, StaffRoleSchema } from "@tsu-stack/core/auth";
 import { tenantProcedure } from "#@/lib/procedures/factory";
 import { TenantScopeInputSchema } from "#@/lib/tenancy/scope";
 
-const TenantMembershipOutputSchema = z.object({
+export const TenantMembershipOutputSchema = z.object({
   displayName: z.string(),
   roles: z.array(StaffRoleSchema),
   tenantId: z.string()
 });
+export type TenantMembershipOutput = z.infer<typeof TenantMembershipOutputSchema>;
 
 export const tenantRouter = {
   membership: tenantProcedure(TenantScopeInputSchema, STAFF_ROLES)

@@ -113,8 +113,14 @@ export function NotePane({
     if (!note || !canWriteClinical) {
       return;
     }
+    const parsed = buildNoteInput(form);
+    if (!parsed.ok) {
+      toast.error(parsed.message);
+      return;
+    }
     try {
-      await signNote.mutateAsync({ consultNoteId: note.id, tenantId });
+      const saved = await saveNote.mutateAsync({ ...parsed.value, encounterId, tenantId });
+      await signNote.mutateAsync({ consultNoteId: saved.id, tenantId });
       toast.success("Consult note signed.");
       setSignDialogOpen(false);
     } catch (error) {
@@ -152,7 +158,7 @@ export function NotePane({
             <Field className="md:flex-1">
               <FieldLabel>Template</FieldLabel>
               <Select
-                disabled={noteReadOnly || templatesPending}
+                disabled={noteReadOnly || templatesPending || templates.length === 0}
                 value={selectedTemplateId}
                 onValueChange={(value) => setSelectedTemplateId(String(value))}
               >
@@ -173,7 +179,9 @@ export function NotePane({
                 </SelectContent>
               </Select>
               <FieldDescription>
-                Apply fills only note fields that are still empty.
+                {templates.length === 0 && !templatesPending
+                  ? "No templates available."
+                  : "Apply fills only note fields that are still empty."}
               </FieldDescription>
             </Field>
             <Button
@@ -358,7 +366,7 @@ export function NotePane({
       <ConfirmDialog
         confirmLabel="Sign note"
         description="Signing makes this note immutable. Use correction only if a signed note needs a new version."
-        isPending={signNote.isPending}
+        isPending={saveNote.isPending || signNote.isPending}
         open={signDialogOpen}
         title="Sign consult note?"
         onConfirm={() => {

@@ -138,8 +138,18 @@ export function PrescriptionPane({
     if (!prescription || !canWriteClinical) {
       return;
     }
+    const parsed = buildPrescriptionLines(lines);
+    if (!parsed.ok) {
+      toast.error(parsed.message);
+      return;
+    }
     try {
-      await signPrescription.mutateAsync({ prescriptionId: prescription.id, tenantId });
+      const saved = await savePrescription.mutateAsync({
+        encounterId,
+        lines: parsed.value,
+        tenantId
+      });
+      await signPrescription.mutateAsync({ prescriptionId: saved.id, tenantId });
       toast.success("Prescription signed.");
       setSignDialogOpen(false);
     } catch (error) {
@@ -420,7 +430,7 @@ export function PrescriptionPane({
       <ConfirmDialog
         confirmLabel="Sign prescription"
         description="Signing makes this prescription immutable and enables the print route."
-        isPending={signPrescription.isPending}
+        isPending={savePrescription.isPending || signPrescription.isPending}
         open={signDialogOpen}
         title="Sign prescription?"
         onConfirm={() => {

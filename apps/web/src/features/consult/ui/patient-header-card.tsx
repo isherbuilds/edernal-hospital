@@ -39,11 +39,13 @@ export function HeaderCard({
   async function saveAllergies(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     try {
-      await updateAllergies.mutateAsync({
+      const trimmedAllergies = allergiesDraft.trim();
+      const updatedPatient = await updateAllergies.mutateAsync({
         allergies: allergiesDraft,
         patientId: workspace.patient.id,
         tenantId
       });
+      setAllergiesDraft(updatedPatient.allergies ?? trimmedAllergies);
       toast.success("Allergies updated.");
       setIsEditingAllergies(false);
     } catch (error) {

@@ -5,7 +5,7 @@
 
 **Status (2026-07-05):** Phases 0–2 are implemented and green — full unit + real-Postgres runtime suites pass and `vp run build` succeeds. Phase 2 (Doctor loop) is code-complete on branch `phase-2`, pending the external clinical-advisor walkthrough; Phases 3–5 are not started. Below, `[x]` = built and verified in this repo, `[ ]` = not started or an external/human gate.
 
-**Reading guide:** every phase states _why it exists_, then a step-by-step checklist, then an exit gate. A phase is done when its gate passes — not when its checklist looks done. If the date compresses, cut from the _end_ of Phase 3 and Phase 4's P1 items, never from Phase 5 (trust) or the gates.
+**Reading guide:** every phase states _why it exists_, then a step-by-step checklist, then an exit gate. A phase is done when its gate passes — not when its checklist looks done. If the date compresses, cut from the _end_ of Phase 3 and the lowest-priority Phase 4 items, never from Phase 5 (trust) or the gates.
 
 The repo is built on the tsu-stack base (TanStack Start + Hono + oRPC + Drizzle + Better Auth, Coolify compose files); Phases 0–2 add the tenancy/roles/audit foundation, the front-desk loop, and the doctor loop on top of it. The [schema menu](./reference/schema-menu.md) is a **reference menu** — pull tables per phase, simplified ([ADR-0002](./adr/0002-relational-first-fhir-at-the-seam.md)).
 

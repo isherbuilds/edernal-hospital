@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
+  check,
   date,
   foreignKey,
   index,
@@ -254,6 +255,10 @@ export const consultNotes = pgTable(
     uniqueIndex("consult_notes_tenant_id_supersedes_consult_note_id_unique").on(
       table.tenantId,
       table.supersedesConsultNoteId
+    ),
+    check(
+      "consult_notes_signed_metadata_check",
+      sql`(${table.status} = 'preliminary' AND ${table.signedAt} IS NULL AND ${table.signedByUserId} IS NULL) OR (${table.status} IN ('signed', 'superseded') AND ${table.signedAt} IS NOT NULL AND ${table.signedByUserId} IS NOT NULL)`
     )
   ]
 );
@@ -307,6 +312,10 @@ export const prescriptions = pgTable(
     uniqueIndex("prescriptions_tenant_id_supersedes_prescription_id_unique").on(
       table.tenantId,
       table.supersedesPrescriptionId
+    ),
+    check(
+      "prescriptions_signed_metadata_check",
+      sql`(${table.status} = 'preliminary' AND ${table.signedAt} IS NULL AND ${table.signedByUserId} IS NULL) OR (${table.status} IN ('signed', 'superseded') AND ${table.signedAt} IS NOT NULL AND ${table.signedByUserId} IS NOT NULL)`
     )
   ]
 );

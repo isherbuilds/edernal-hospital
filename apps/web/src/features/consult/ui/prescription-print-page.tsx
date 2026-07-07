@@ -42,7 +42,8 @@ export function PrescriptionPrintPage({ prescriptionId }: { prescriptionId?: str
       return;
     }
     printedOnce.current = true;
-    window.setTimeout(() => window.print(), 0);
+    const timeoutId = window.setTimeout(() => window.print(), 0);
+    return () => window.clearTimeout(timeoutId);
   }, [printQuery.data]);
 
   return (

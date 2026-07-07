@@ -95,52 +95,52 @@ Primary seam — oRPC procedures through the runtime harness (`packages/api/src/
 
 - [x] Slice 1: Core clinical contracts + audit registry
   - Acceptance: `@tsu-stack/core/clinical` exports status + vitals schemas/constants; audit registries include the four new resource types and `sign`; core tests cover schema edges.
-  - Verify: `vp check --fix` + `vp test` in packages/core
+  - Verify: `vp run check --fix` + `vp run test` in packages/core
   - Depends on: none
   - Interfaces: exports `CLINICAL_ARTIFACT_STATUS`, `ClinicalArtifactStatusSchema`, `ConsultNoteVitalsSchema`, `ConsultNoteVitals`; `AUDIT_ACTIONS` includes `"sign"`; `AUDIT_RESOURCE_TYPES` includes `"consult_note" | "prescription" | "formulary_item" | "note_template"`.
 - [x] Slice 2: UI primitives
   - Acceptance: textarea, card, dialog, badge, table, select exist in packages/ui and typecheck.
-  - Verify: `vp check --fix` in packages/ui
+  - Verify: `vp run check --fix` in packages/ui
   - Depends on: none
   - Interfaces: `@tsu-stack/ui/components/{textarea,card,dialog,badge,table,select}`.
 - [x] Slice 3: DB schema + migrations + immutability triggers
   - Acceptance: five new tables + `patients.allergies` per Implementation Decisions; drizzle-generated migration applied to local DB; custom trigger migration blocks mutation of signed rows and line changes under signed parents; relations registered.
-  - Verify: `vp run db:generate` + `vp run db:migrate` (DATABASE_URL localhost-checked) + `vp check --fix` in packages/db
+  - Verify: `vp run db:generate` + `vp run db:migrate` (DATABASE_URL localhost-checked) + `vp run check --fix` in packages/db
   - Depends on: Slice 1
   - Interfaces: `@tsu-stack/db/schema` exports `consultNotes`, `prescriptions`, `prescriptionLines`, `formularyItems`, `noteTemplates`, `clinicalArtifactStatus`; `patients.allergies`.
 - [x] Slice 4: TenantAudit sign/print extension
   - Acceptance: `audit.write` accepts action `sign`; `audit.print(...)` emits a print event; existing audit tests still pass; new unit coverage for both.
-  - Verify: `vp test` (audit tests) in packages/api
+  - Verify: `vp run test` (audit tests) in packages/api
   - Depends on: Slice 1
   - Interfaces: `TenantAudit.write({action: "create"|"update"|"delete"|"sign", ...})`; `TenantAudit.print({resourceType, resourceId?, details?})`.
 - [x] Slice 5: consult router + runtime tests (riskiest)
   - Acceptance: all eight consult procedures per Implementation Decisions; lifecycle, identity, immutability (API + raw-tx trigger), signed-only print, audit emission, and cross-tenant denial proven in `doctor-loop-runtime.test.ts`.
-  - Verify: `vp test` (doctor-loop-runtime) in packages/api
+  - Verify: `vp run test` (doctor-loop-runtime) in packages/api
   - Depends on: Slice 3, Slice 4
   - Interfaces: `appRouter.consult.{workspace,saveNote,signNote,supersedeNote,savePrescription,signPrescription,supersedePrescription,printPrescription}`; workspace patient uses `toPatientOutput`/`PatientOutputSchema` from `routers/patient/queries.ts` (do not redefine); does NOT edit `procedure-access.test.ts` (Slice 11 owns it).
 - [x] Slice 6: formulary + noteTemplate routers + seed
   - Acceptance: CRUD/search/list per Implementation Decisions with duplicate CONFLICT, role denial, cross-tenant denial, audit emission tested; seed adds formulary items + templates idempotently.
-  - Verify: `vp test` (new test file) in packages/api; seed runs clean twice
+  - Verify: `vp run test` (new test file) in packages/api; seed runs clean twice
   - Depends on: Slice 3, Slice 4
   - Interfaces: `appRouter.formulary.{search,list,create,update}`, `appRouter.noteTemplate.{list,create,update}`; `FormularyItemOutputSchema` (id, name, strength, form, defaultDoseText, status), `NoteTemplateOutputSchema` (id, name, specialty, five content fields, status); does NOT edit `procedure-access.test.ts`.
 - [x] Slice 7: patient allergies API
   - Acceptance: `patient.updateAllergies` with roles above; `allergies` in `PatientOutputSchema` + `toPatientOutput` + optional in quickRegister input; audit carries no allergy text; runtime tests.
-  - Verify: `vp test` (patient tests) in packages/api
+  - Verify: `vp run test` (patient tests) in packages/api
   - Depends on: Slice 3, Slice 4
   - Interfaces: `PatientOutputSchema.allergies: string`; `appRouter.patient.updateAllergies({tenantId, patientId, allergies})`; quickRegister input `allergies?: string`; does NOT edit `procedure-access.test.ts` or `front-desk-page.tsx` (Slice 9 owns the UI).
 - [x] Slice 8: Consult screen + Rx print UI
   - Acceptance: consult route renders workspace (allergy banner, note form with template prefill, Rx composer with formulary quick-pick); sign flows with confirm dialog; print route renders letterhead payload and auto-prints; unsigned print shows the API error state; typechecks.
-  - Verify: `vp check --fix` in apps/web + dev-server render
+  - Verify: `vp run check --fix` in apps/web + dev-server render
   - Depends on: Slice 2, Slice 5, Slice 6, Slice 7
   - Interfaces: routes `/consult/$encounterId` and `/consult/$encounterId/print`; `features/consult/` slice with `api/` wrappers per api-fetching-patterns.
 - [x] Slice 9: Front-desk + queue wiring
   - Acceptance: start-consult navigates to `/consult/$encounterId`; in-consult rows expose "Open consult"; queue outputs expose `encounterId`; registration form has optional allergies field wired to quickRegister.
-  - Verify: `vp check --fix` in apps/web (+ packages/api if queue output changes)
+  - Verify: `vp run check --fix` in apps/web (+ packages/api if queue output changes)
   - Depends on: Slice 8
   - Interfaces: consumes route from Slice 8 and quickRegister input from Slice 7.
 - [x] Slice 10: Admin screens (formulary + note templates)
   - Acceptance: both admin routes list/create/edit/toggle-status via dialogs, hospital_admin-gated, navbar entries added (Paraglide keys, en.json only).
-  - Verify: `vp check --fix` in apps/web + dev-server render
+  - Verify: `vp run check --fix` in apps/web + dev-server render
   - Depends on: Slice 2, Slice 6
   - Interfaces: routes `/admin/formulary`, `/admin/note-templates`; navbar keys `navbar__formulary`, `navbar__note_templates`.
 - [x] Slice 11: Integration — procedure registry, full suite, smoke

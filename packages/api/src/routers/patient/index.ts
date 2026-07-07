@@ -67,7 +67,11 @@ export const patientRouter = {
     .handler(({ context, input }) =>
       withTenantTx(context, "patient.quickRegister", (scope) => quickRegisterPatient(scope, input))
     ),
-  updateAllergies: tenantProcedure(PatientUpdateAllergiesInputSchema, patientReaderRoles)
+  updateAllergies: tenantProcedure(PatientUpdateAllergiesInputSchema, [
+    STAFF_ROLE.FRONT_DESK,
+    STAFF_ROLE.PRACTITIONER,
+    STAFF_ROLE.HOSPITAL_ADMIN
+  ])
     .route({
       description: "Update a Patient's allergy note in the requested Tenant",
       method: "POST"

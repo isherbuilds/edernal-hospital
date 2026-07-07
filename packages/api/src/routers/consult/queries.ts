@@ -217,16 +217,16 @@ export async function supersedeConsultNote(
   if (!currentNote) {
     consultMappers.notFound("Consult note not found in the requested Tenant.");
   }
-  consultData.assertSupersedable(currentNote.status, {
-    alreadySuperseded: "Consult note has already been superseded.",
-    notSigned: "Only signed notes can be superseded"
-  });
-
   await consultData.assertSessionOwnsPractitioner(
     scope,
     { practitionerId: currentNote.practitionerId, userId },
     forbidden
   );
+
+  consultData.assertSupersedable(currentNote.status, {
+    alreadySuperseded: "Consult note has already been superseded.",
+    notSigned: "Only signed notes can be superseded"
+  });
 
   const [oldNote] = await scope.tx
     .update(consultNotes)
@@ -435,16 +435,16 @@ export async function supersedeEncounterPrescription(
   if (!currentPrescription) {
     consultMappers.notFound("Prescription not found in the requested Tenant.");
   }
-  consultData.assertSupersedable(currentPrescription.status, {
-    alreadySuperseded: "Prescription has already been superseded.",
-    notSigned: "Only signed prescriptions can be superseded"
-  });
-
   await consultData.assertSessionOwnsPractitioner(
     scope,
     { practitionerId: currentPrescription.practitionerId, userId },
     forbidden
   );
+
+  consultData.assertSupersedable(currentPrescription.status, {
+    alreadySuperseded: "Prescription has already been superseded.",
+    notSigned: "Only signed prescriptions can be superseded"
+  });
 
   const oldLines = await consultData.prescriptionLinesFor(scope, currentPrescription.id);
   const [oldPrescription] = await scope.tx

@@ -244,11 +244,28 @@ export function FormularyAdminPage() {
 
     try {
       if (editingItem) {
-        await updateFormularyItem.mutateAsync({
-          ...input,
-          formularyItemId: editingItem.id
-        });
-        toast.success("Formulary item updated.");
+        const changes: Partial<FormularyItemFormState> = {};
+        if (input.name !== editingItem.name) {
+          changes.name = input.name;
+        }
+        if (input.strength !== editingItem.strength) {
+          changes.strength = input.strength;
+        }
+        if (input.form !== editingItem.form) {
+          changes.form = input.form;
+        }
+        if (input.defaultDoseText !== editingItem.defaultDoseText) {
+          changes.defaultDoseText = input.defaultDoseText;
+        }
+
+        if (Object.keys(changes).length > 0) {
+          await updateFormularyItem.mutateAsync({
+            ...changes,
+            formularyItemId: editingItem.id,
+            tenantId
+          });
+          toast.success("Formulary item updated.");
+        }
       } else {
         await createFormularyItem.mutateAsync(input);
         toast.success("Formulary item created.");
@@ -325,7 +342,7 @@ export function FormularyAdminPage() {
       ) : !canManageFormulary ? (
         <Empty>
           <EmptyHeader>
-            <EmptyTitle>not allowed</EmptyTitle>
+            <EmptyTitle>Not allowed</EmptyTitle>
             <EmptyDescription>
               Formulary administration requires the hospital admin role for this organization.
             </EmptyDescription>
