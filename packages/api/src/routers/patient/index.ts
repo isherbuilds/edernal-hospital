@@ -19,7 +19,7 @@ import {
   updatePatientAllergies
 } from "./queries";
 
-const patientReaderRoles = [
+const patientStaffRoles = [
   STAFF_ROLE.FRONT_DESK,
   STAFF_ROLE.PRACTITIONER,
   STAFF_ROLE.HOSPITAL_ADMIN
@@ -31,7 +31,7 @@ export const PatientIdentifierCreateInputSchema = PatientByIdInputSchema.extend(
 });
 
 export const patientRouter = {
-  byId: tenantProcedure(PatientByIdInputSchema, patientReaderRoles)
+  byId: tenantProcedure(PatientByIdInputSchema, patientStaffRoles)
     .route({
       description: "Get a Patient by ID in the requested Tenant",
       method: "GET"
@@ -67,11 +67,7 @@ export const patientRouter = {
     .handler(({ context, input }) =>
       withTenantTx(context, "patient.quickRegister", (scope) => quickRegisterPatient(scope, input))
     ),
-  updateAllergies: tenantProcedure(PatientUpdateAllergiesInputSchema, [
-    STAFF_ROLE.FRONT_DESK,
-    STAFF_ROLE.PRACTITIONER,
-    STAFF_ROLE.HOSPITAL_ADMIN
-  ])
+  updateAllergies: tenantProcedure(PatientUpdateAllergiesInputSchema, patientStaffRoles)
     .route({
       description: "Update a Patient's allergy note in the requested Tenant",
       method: "POST"
@@ -82,7 +78,7 @@ export const patientRouter = {
         updatePatientAllergies(scope, input)
       )
     ),
-  searchByPhone: tenantProcedure(PatientSearchInputSchema, patientReaderRoles)
+  searchByPhone: tenantProcedure(PatientSearchInputSchema, patientStaffRoles)
     .route({
       description: "Search Patients by normalized phone number in the requested Tenant",
       method: "GET"
