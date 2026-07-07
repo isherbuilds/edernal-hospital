@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { orpc } from "@tsu-stack/api/client/tanstack-start/orpc";
 import { type ConsultWorkspaceOutput } from "@tsu-stack/api/routers/consult/queries";
@@ -20,6 +20,15 @@ export const consultWorkspaceQueryKeys = {
     });
   }
 };
+
+export function useInvalidateConsultWorkspace() {
+  const queryClient = useQueryClient();
+
+  return (tenantId: string, encounterId: string) =>
+    queryClient.invalidateQueries({
+      queryKey: consultWorkspaceQueryKeys.byEncounter(tenantId, encounterId)
+    });
+}
 
 export function getConsultWorkspaceQueryOptions(input: ConsultWorkspaceQueryInput) {
   return orpc.consult.workspace.queryOptions({ input });

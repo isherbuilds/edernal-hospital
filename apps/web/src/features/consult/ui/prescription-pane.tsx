@@ -26,13 +26,14 @@ import {
   TableRow
 } from "@tsu-stack/ui/components/table";
 
+import { getErrorMessage } from "@/shared/lib/get-error-message";
+
 import { useSavePrescriptionMutation } from "@/features/consult/api/save-prescription.mutation";
 import { useSearchFormularyQuery } from "@/features/consult/api/search-formulary.query";
 import { useSignPrescriptionMutation } from "@/features/consult/api/sign-prescription.mutation";
 import { useSupersedePrescriptionMutation } from "@/features/consult/api/supersede-prescription.mutation";
 import {
   buildPrescriptionLines,
-  getErrorMessage,
   type PrescriptionLineForm
 } from "@/features/consult/ui/consult-form.helpers";
 import { ClinicalStatusBadge, ConfirmDialog } from "@/features/consult/ui/consult-ui";

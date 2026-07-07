@@ -7,10 +7,6 @@ import { getErrorMessage } from "@/shared/lib/get-error-message";
 
 import { noteTemplatesQueryKeys } from "./list-note-templates.query";
 
-export function createNoteTemplateMutationOptions() {
-  return orpc.noteTemplate.create.mutationOptions();
-}
-
 export function useCreateNoteTemplateMutation(tenantId: string) {
   const queryClient = useQueryClient();
 

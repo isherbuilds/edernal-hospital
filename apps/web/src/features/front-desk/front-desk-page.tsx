@@ -24,6 +24,7 @@ import { Input } from "@tsu-stack/ui/components/input";
 import { Separator } from "@tsu-stack/ui/components/separator";
 import { Spinner } from "@tsu-stack/ui/components/spinner";
 
+import { getErrorMessage } from "@/shared/lib/get-error-message";
 import { Container } from "@/shared/ui/container";
 
 type RegistrationDuplicatePrompt = {
@@ -51,16 +52,6 @@ function getPhoneDigits(value: string) {
     }
   }
   return digits;
-}
-
-function getErrorMessage(error: unknown, fallback: string) {
-  if (error instanceof Error && error.message.trim().length > 0) {
-    return error.message;
-  }
-  const errorRecord =
-    typeof error === "object" && error !== null ? (error as Record<string, unknown>) : null;
-  const message = errorRecord?.message;
-  return typeof message === "string" && message.trim().length > 0 ? message : fallback;
 }
 
 function isRegisterAnywaySubmit(event: FormEvent<HTMLFormElement>) {

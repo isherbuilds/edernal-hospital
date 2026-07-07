@@ -29,37 +29,30 @@ export {
   type FormularySearchQueryResult
 } from "./api/search-formulary.query";
 export {
-  saveConsultNoteMutationOptions,
   useSaveConsultNoteMutation,
   type SaveConsultNoteMutationResult
 } from "./api/save-consult-note.mutation";
 export {
-  signConsultNoteMutationOptions,
   useSignConsultNoteMutation,
   type SignConsultNoteMutationResult
 } from "./api/sign-consult-note.mutation";
 export {
-  supersedeConsultNoteMutationOptions,
   useSupersedeConsultNoteMutation,
   type SupersedeConsultNoteMutationResult
 } from "./api/supersede-consult-note.mutation";
 export {
-  savePrescriptionMutationOptions,
   useSavePrescriptionMutation,
   type SavePrescriptionMutationResult
 } from "./api/save-prescription.mutation";
 export {
-  signPrescriptionMutationOptions,
   useSignPrescriptionMutation,
   type SignPrescriptionMutationResult
 } from "./api/sign-prescription.mutation";
 export {
-  supersedePrescriptionMutationOptions,
   useSupersedePrescriptionMutation,
   type SupersedePrescriptionMutationResult
 } from "./api/supersede-prescription.mutation";
 export {
-  updatePatientAllergiesMutationOptions,
   useUpdatePatientAllergiesMutation,
   type UpdatePatientAllergiesMutationResult
 } from "./api/update-patient-allergies.mutation";

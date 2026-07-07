@@ -23,13 +23,14 @@ import {
   SelectValue
 } from "@tsu-stack/ui/components/select";
 
+import { getErrorMessage } from "@/shared/lib/get-error-message";
+
 import { useSaveConsultNoteMutation } from "@/features/consult/api/save-consult-note.mutation";
 import { useSignConsultNoteMutation } from "@/features/consult/api/sign-consult-note.mutation";
 import { useSupersedeConsultNoteMutation } from "@/features/consult/api/supersede-consult-note.mutation";
 import {
   buildNoteInput,
   emptyNoteForm,
-  getErrorMessage,
   noteFormFromOutput,
   type NoteFormState
 } from "@/features/consult/ui/consult-form.helpers";

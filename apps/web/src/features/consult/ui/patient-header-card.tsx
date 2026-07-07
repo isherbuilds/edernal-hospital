@@ -13,12 +13,10 @@ import {
 import { Textarea } from "@tsu-stack/ui/components/textarea";
 import { cn } from "@tsu-stack/ui/lib/utils";
 
+import { getErrorMessage } from "@/shared/lib/get-error-message";
+
 import { useUpdatePatientAllergiesMutation } from "@/features/consult/api/update-patient-allergies.mutation";
-import {
-  formatPatientAgeDob,
-  formatSex,
-  getErrorMessage
-} from "@/features/consult/ui/consult-form.helpers";
+import { formatPatientAgeDob, formatSex } from "@/features/consult/ui/consult-form.helpers";
 
 export function HeaderCard({
   canEditAllergies,
