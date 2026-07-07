@@ -12,11 +12,17 @@ export {
 } from "#@/schema/auth.schema";
 export { auditEvents } from "#@/schema/audit.schema";
 export {
+  clinicalArtifactStatus,
+  consultNotes,
   encounterStatus,
   encounters,
+  formularyItems,
+  noteTemplates,
   patientIdentifiers,
   patients,
   patientSex,
+  prescriptionLines,
+  prescriptions,
   tokenStatus,
   tokens
 } from "#@/schema/clinical.schema";

@@ -26,6 +26,10 @@ import { Route as Char123LocaleChar125rootLayoutauthFrontDeskIndexRouteImport } 
 import { Route as Char123LocaleChar125rootLayoutauthDashboardIndexRouteImport } from './routes/{-$locale}/(root-layout)/(auth)/dashboard/index'
 import { Route as Char123LocaleChar125centeredLayoutguestSignInIndexRouteImport } from './routes/{-$locale}/(centered-layout)/(guest)/sign-in/index'
 import { Route as Char123LocaleChar125centeredLayoutguestCreateAnAccountIndexRouteImport } from './routes/{-$locale}/(centered-layout)/(guest)/create-an-account/index'
+import { Route as Char123LocaleChar125rootLayoutauthConsultEncounterIdIndexRouteImport } from './routes/{-$locale}/(root-layout)/(auth)/consult/$encounterId/index'
+import { Route as Char123LocaleChar125rootLayoutauthAdminNoteTemplatesIndexRouteImport } from './routes/{-$locale}/(root-layout)/(auth)/admin/note-templates/index'
+import { Route as Char123LocaleChar125rootLayoutauthAdminFormularyIndexRouteImport } from './routes/{-$locale}/(root-layout)/(auth)/admin/formulary/index'
+import { Route as Char123LocaleChar125rootLayoutauthConsultEncounterIdPrintRouteImport } from './routes/{-$locale}/(root-layout)/(auth)/consult/$encounterId/print'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -124,6 +128,30 @@ const Char123LocaleChar125centeredLayoutguestCreateAnAccountIndexRoute =
       getParentRoute: () => Char123LocaleChar125centeredLayoutguestRouteRoute,
     } as any,
   )
+const Char123LocaleChar125rootLayoutauthConsultEncounterIdIndexRoute =
+  Char123LocaleChar125rootLayoutauthConsultEncounterIdIndexRouteImport.update({
+    id: '/consult/$encounterId/',
+    path: '/consult/$encounterId/',
+    getParentRoute: () => Char123LocaleChar125rootLayoutauthRouteRoute,
+  } as any)
+const Char123LocaleChar125rootLayoutauthAdminNoteTemplatesIndexRoute =
+  Char123LocaleChar125rootLayoutauthAdminNoteTemplatesIndexRouteImport.update({
+    id: '/admin/note-templates/',
+    path: '/admin/note-templates/',
+    getParentRoute: () => Char123LocaleChar125rootLayoutauthRouteRoute,
+  } as any)
+const Char123LocaleChar125rootLayoutauthAdminFormularyIndexRoute =
+  Char123LocaleChar125rootLayoutauthAdminFormularyIndexRouteImport.update({
+    id: '/admin/formulary/',
+    path: '/admin/formulary/',
+    getParentRoute: () => Char123LocaleChar125rootLayoutauthRouteRoute,
+  } as any)
+const Char123LocaleChar125rootLayoutauthConsultEncounterIdPrintRoute =
+  Char123LocaleChar125rootLayoutauthConsultEncounterIdPrintRouteImport.update({
+    id: '/consult/$encounterId/print',
+    path: '/consult/$encounterId/print',
+    getParentRoute: () => Char123LocaleChar125rootLayoutauthRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/{-$locale}': typeof Char123LocaleChar125rootLayoutauthRouteRouteWithChildren
@@ -139,6 +167,10 @@ export interface FileRoutesByFullPath {
   '/{-$locale}/sign-in/': typeof Char123LocaleChar125centeredLayoutguestSignInIndexRoute
   '/{-$locale}/dashboard/': typeof Char123LocaleChar125rootLayoutauthDashboardIndexRoute
   '/{-$locale}/front-desk/': typeof Char123LocaleChar125rootLayoutauthFrontDeskIndexRoute
+  '/{-$locale}/consult/$encounterId/print': typeof Char123LocaleChar125rootLayoutauthConsultEncounterIdPrintRoute
+  '/{-$locale}/admin/formulary/': typeof Char123LocaleChar125rootLayoutauthAdminFormularyIndexRoute
+  '/{-$locale}/admin/note-templates/': typeof Char123LocaleChar125rootLayoutauthAdminNoteTemplatesIndexRoute
+  '/{-$locale}/consult/$encounterId/': typeof Char123LocaleChar125rootLayoutauthConsultEncounterIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/{-$locale}': typeof Char123LocaleChar125rootLayoutIndexRoute
@@ -153,6 +185,10 @@ export interface FileRoutesByTo {
   '/{-$locale}/sign-in': typeof Char123LocaleChar125centeredLayoutguestSignInIndexRoute
   '/{-$locale}/dashboard': typeof Char123LocaleChar125rootLayoutauthDashboardIndexRoute
   '/{-$locale}/front-desk': typeof Char123LocaleChar125rootLayoutauthFrontDeskIndexRoute
+  '/{-$locale}/consult/$encounterId/print': typeof Char123LocaleChar125rootLayoutauthConsultEncounterIdPrintRoute
+  '/{-$locale}/admin/formulary': typeof Char123LocaleChar125rootLayoutauthAdminFormularyIndexRoute
+  '/{-$locale}/admin/note-templates': typeof Char123LocaleChar125rootLayoutauthAdminNoteTemplatesIndexRoute
+  '/{-$locale}/consult/$encounterId': typeof Char123LocaleChar125rootLayoutauthConsultEncounterIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -173,6 +209,10 @@ export interface FileRoutesById {
   '/{-$locale}/(centered-layout)/(guest)/sign-in/': typeof Char123LocaleChar125centeredLayoutguestSignInIndexRoute
   '/{-$locale}/(root-layout)/(auth)/dashboard/': typeof Char123LocaleChar125rootLayoutauthDashboardIndexRoute
   '/{-$locale}/(root-layout)/(auth)/front-desk/': typeof Char123LocaleChar125rootLayoutauthFrontDeskIndexRoute
+  '/{-$locale}/(root-layout)/(auth)/consult/$encounterId/print': typeof Char123LocaleChar125rootLayoutauthConsultEncounterIdPrintRoute
+  '/{-$locale}/(root-layout)/(auth)/admin/formulary/': typeof Char123LocaleChar125rootLayoutauthAdminFormularyIndexRoute
+  '/{-$locale}/(root-layout)/(auth)/admin/note-templates/': typeof Char123LocaleChar125rootLayoutauthAdminNoteTemplatesIndexRoute
+  '/{-$locale}/(root-layout)/(auth)/consult/$encounterId/': typeof Char123LocaleChar125rootLayoutauthConsultEncounterIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -190,6 +230,10 @@ export interface FileRouteTypes {
     | '/{-$locale}/sign-in/'
     | '/{-$locale}/dashboard/'
     | '/{-$locale}/front-desk/'
+    | '/{-$locale}/consult/$encounterId/print'
+    | '/{-$locale}/admin/formulary/'
+    | '/{-$locale}/admin/note-templates/'
+    | '/{-$locale}/consult/$encounterId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/{-$locale}'
@@ -204,6 +248,10 @@ export interface FileRouteTypes {
     | '/{-$locale}/sign-in'
     | '/{-$locale}/dashboard'
     | '/{-$locale}/front-desk'
+    | '/{-$locale}/consult/$encounterId/print'
+    | '/{-$locale}/admin/formulary'
+    | '/{-$locale}/admin/note-templates'
+    | '/{-$locale}/consult/$encounterId'
   id:
     | '__root__'
     | '/{-$locale}'
@@ -223,6 +271,10 @@ export interface FileRouteTypes {
     | '/{-$locale}/(centered-layout)/(guest)/sign-in/'
     | '/{-$locale}/(root-layout)/(auth)/dashboard/'
     | '/{-$locale}/(root-layout)/(auth)/front-desk/'
+    | '/{-$locale}/(root-layout)/(auth)/consult/$encounterId/print'
+    | '/{-$locale}/(root-layout)/(auth)/admin/formulary/'
+    | '/{-$locale}/(root-layout)/(auth)/admin/note-templates/'
+    | '/{-$locale}/(root-layout)/(auth)/consult/$encounterId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -353,6 +405,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char123LocaleChar125centeredLayoutguestCreateAnAccountIndexRouteImport
       parentRoute: typeof Char123LocaleChar125centeredLayoutguestRouteRoute
     }
+    '/{-$locale}/(root-layout)/(auth)/consult/$encounterId/': {
+      id: '/{-$locale}/(root-layout)/(auth)/consult/$encounterId/'
+      path: '/consult/$encounterId'
+      fullPath: '/{-$locale}/consult/$encounterId/'
+      preLoaderRoute: typeof Char123LocaleChar125rootLayoutauthConsultEncounterIdIndexRouteImport
+      parentRoute: typeof Char123LocaleChar125rootLayoutauthRouteRoute
+    }
+    '/{-$locale}/(root-layout)/(auth)/admin/note-templates/': {
+      id: '/{-$locale}/(root-layout)/(auth)/admin/note-templates/'
+      path: '/admin/note-templates'
+      fullPath: '/{-$locale}/admin/note-templates/'
+      preLoaderRoute: typeof Char123LocaleChar125rootLayoutauthAdminNoteTemplatesIndexRouteImport
+      parentRoute: typeof Char123LocaleChar125rootLayoutauthRouteRoute
+    }
+    '/{-$locale}/(root-layout)/(auth)/admin/formulary/': {
+      id: '/{-$locale}/(root-layout)/(auth)/admin/formulary/'
+      path: '/admin/formulary'
+      fullPath: '/{-$locale}/admin/formulary/'
+      preLoaderRoute: typeof Char123LocaleChar125rootLayoutauthAdminFormularyIndexRouteImport
+      parentRoute: typeof Char123LocaleChar125rootLayoutauthRouteRoute
+    }
+    '/{-$locale}/(root-layout)/(auth)/consult/$encounterId/print': {
+      id: '/{-$locale}/(root-layout)/(auth)/consult/$encounterId/print'
+      path: '/consult/$encounterId/print'
+      fullPath: '/{-$locale}/consult/$encounterId/print'
+      preLoaderRoute: typeof Char123LocaleChar125rootLayoutauthConsultEncounterIdPrintRouteImport
+      parentRoute: typeof Char123LocaleChar125rootLayoutauthRouteRoute
+    }
   }
 }
 
@@ -392,6 +472,10 @@ const Char123LocaleChar125centeredLayoutRouteRouteWithChildren =
 interface Char123LocaleChar125rootLayoutauthRouteRouteChildren {
   Char123LocaleChar125rootLayoutauthDashboardIndexRoute: typeof Char123LocaleChar125rootLayoutauthDashboardIndexRoute
   Char123LocaleChar125rootLayoutauthFrontDeskIndexRoute: typeof Char123LocaleChar125rootLayoutauthFrontDeskIndexRoute
+  Char123LocaleChar125rootLayoutauthConsultEncounterIdPrintRoute: typeof Char123LocaleChar125rootLayoutauthConsultEncounterIdPrintRoute
+  Char123LocaleChar125rootLayoutauthAdminFormularyIndexRoute: typeof Char123LocaleChar125rootLayoutauthAdminFormularyIndexRoute
+  Char123LocaleChar125rootLayoutauthAdminNoteTemplatesIndexRoute: typeof Char123LocaleChar125rootLayoutauthAdminNoteTemplatesIndexRoute
+  Char123LocaleChar125rootLayoutauthConsultEncounterIdIndexRoute: typeof Char123LocaleChar125rootLayoutauthConsultEncounterIdIndexRoute
 }
 
 const Char123LocaleChar125rootLayoutauthRouteRouteChildren: Char123LocaleChar125rootLayoutauthRouteRouteChildren =
@@ -400,6 +484,14 @@ const Char123LocaleChar125rootLayoutauthRouteRouteChildren: Char123LocaleChar125
       Char123LocaleChar125rootLayoutauthDashboardIndexRoute,
     Char123LocaleChar125rootLayoutauthFrontDeskIndexRoute:
       Char123LocaleChar125rootLayoutauthFrontDeskIndexRoute,
+    Char123LocaleChar125rootLayoutauthConsultEncounterIdPrintRoute:
+      Char123LocaleChar125rootLayoutauthConsultEncounterIdPrintRoute,
+    Char123LocaleChar125rootLayoutauthAdminFormularyIndexRoute:
+      Char123LocaleChar125rootLayoutauthAdminFormularyIndexRoute,
+    Char123LocaleChar125rootLayoutauthAdminNoteTemplatesIndexRoute:
+      Char123LocaleChar125rootLayoutauthAdminNoteTemplatesIndexRoute,
+    Char123LocaleChar125rootLayoutauthConsultEncounterIdIndexRoute:
+      Char123LocaleChar125rootLayoutauthConsultEncounterIdIndexRoute,
   }
 
 const Char123LocaleChar125rootLayoutauthRouteRouteWithChildren =

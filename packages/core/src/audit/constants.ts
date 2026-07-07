@@ -3,6 +3,7 @@ export const AUDIT_ACTIONS = [
   "read",
   "search",
   "update",
+  "sign",
   "print",
   "export",
   "delete"
@@ -16,5 +17,9 @@ export const AUDIT_RESOURCE_TYPES = [
   "patient",
   "patient_identifier",
   "encounter",
-  "token"
+  "token",
+  "consult_note",
+  "prescription",
+  "formulary_item",
+  "note_template"
 ] as const;

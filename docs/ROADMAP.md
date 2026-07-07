@@ -3,9 +3,11 @@
 **Anchor:** hard go-live at the design-partner hospital in ~8–12 weeks (solo founder + AI agents, strictly serial phases).
 **Scope authority:** [PILOT-SCOPE.md](./PILOT-SCOPE.md). **Decisions:** [docs/adr/](./adr/). **Glossary:** [CONTEXT.md](../CONTEXT.md).
 
+**Status (2026-07-05):** Phases 0–2 are implemented and green — full unit + real-Postgres runtime suites pass and `vp run build` succeeds. Phase 2 (Doctor loop) is code-complete on branch `phase-2`, pending the external clinical-advisor walkthrough; Phases 3–5 are not started. Below, `[x]` = built and verified in this repo, `[ ]` = not started or an external/human gate.
+
 **Reading guide:** every phase states _why it exists_, then a step-by-step checklist, then an exit gate. A phase is done when its gate passes — not when its checklist looks done. If the date compresses, cut from the _end_ of Phase 3 and Phase 4's P1 items, never from Phase 5 (trust) or the gates.
 
-The repo today is a pristine tsu-stack starter (TanStack Start + Hono + oRPC + Drizzle + Better Auth, Coolify compose files). The [schema menu](./reference/schema-menu.md) is a **reference menu** — pull tables per phase, simplified ([ADR-0002](./adr/0002-relational-first-fhir-at-the-seam.md)).
+The repo is built on the tsu-stack base (TanStack Start + Hono + oRPC + Drizzle + Better Auth, Coolify compose files); Phases 0–2 add the tenancy/roles/audit foundation, the front-desk loop, and the doctor loop on top of it. The [schema menu](./reference/schema-menu.md) is a **reference menu** — pull tables per phase, simplified ([ADR-0002](./adr/0002-relational-first-fhir-at-the-seam.md)).
 
 ---
 
@@ -19,20 +21,20 @@ The repo today is a pristine tsu-stack starter (TanStack Start + Hono + oRPC + D
 
 **Checklist**
 
-- [ ] Enable Better Auth `organization` (= Tenant) plugin; verified organization membership is the Tenant boundary. Defer `twoFactor` until the admin MFA enrollment/verification UX is built; defer Better Auth `admin` until support impersonation has a signed Audit Event design.
-- [ ] Extend Better Auth `organization` with Tenant profile fields (`display_name`, `legal_name`, `default_timezone`) and `member` with lightweight Staff User attributes (`employee_code`, `display_name_override`); do not add a separate 1:1 `tenants` table.
-- [ ] Core Tenant-owned tables in `@tsu-stack/db`: `facilities`, `practitioners`, and `audit_events`, each carrying `tenant_id = organization.id`.
-- [ ] Facility is a data foreign key carried on Facility-owned rows, not an auth/scoping boundary at pilot (one Facility per pilot Tenant; role+Tenant is the access model per [ADR-0004](./adr/0004-pilot-trust-envelope.md)).
-- [ ] Role slugs/constants in `packages/core`: `front_desk`, `practitioner`, `billing`, `pharmacy_lab`, `hospital_admin`; Better Auth organization member role is authoritative; member additional fields carry lightweight Staff User attributes, never a second role source.
-- [ ] oRPC procedure factory role check helper is deny-by-default: every procedure declares allowed roles or fails closed; unauthenticated procedures (login, health) must be **explicitly marked public**.
-- [ ] Tenant context middleware: treat client-provided Tenant IDs as selectors only; verify Better Auth membership server-side before any Tenant-scoped query.
-- [ ] Tenant-scoped query helpers/procedure context: every PHI read/write requires Tenant context, scopes by `tenant_id`, and exposes no unscoped DB helpers to feature code.
-- [ ] `audit_events` table: tenant-owned append-only events (`tenant_id`, actor user id, action, resource type/id, timestamp), queryable later by patient/actor/date; migrations run as owner role while the runtime app DB role has INSERT/SELECT only and no UPDATE/DELETE; `audit()` helper wires into the procedure factory so PHI procedures emit events without per-endpoint boilerplate; for writes, the event is inserted **in the same transaction** as the write it records; reads/searches also emit Audit Events through the same non-optional helper API without hard-coding one-event-per-row.
-- [ ] PHI-safe logger wrapper over `@tsu-stack/logger`: accepts IDs/codes/metrics only; CI grep/test that fails on known PHI field names in log calls.
-- [ ] Seed script: two synthetic Better Auth organizations/Tenants, one Facility each, users per role, practitioners; the seed grows with each phase.
-- [ ] CI: typecheck, lint, unit tests, reusable **cross-tenant denial test harness** against Phase-0 Tenant-owned resources (Practitioner/Facility records; later phases extend it), audit-emission tests for read and write paths, PHI-log test.
+- [x] Enable Better Auth `organization` (= Tenant) plugin; verified organization membership is the Tenant boundary. Defer `twoFactor` until the admin MFA enrollment/verification UX is built; defer Better Auth `admin` until support impersonation has a signed Audit Event design.
+- [x] Extend Better Auth `organization` with Tenant profile fields (`display_name`, `legal_name`, `default_timezone`) and `member` with lightweight Staff User attributes (`employee_code`, `display_name_override`); do not add a separate 1:1 `tenants` table.
+- [x] Core Tenant-owned tables in `@tsu-stack/db`: `facilities`, `practitioners`, and `audit_events`, each carrying `tenant_id = organization.id`.
+- [x] Facility is a data foreign key carried on Facility-owned rows, not an auth/scoping boundary at pilot (one Facility per pilot Tenant; role+Tenant is the access model per [ADR-0004](./adr/0004-pilot-trust-envelope.md)).
+- [x] Role slugs/constants in `packages/core`: `front_desk`, `practitioner`, `billing`, `pharmacy_lab`, `hospital_admin`; Better Auth organization member role is authoritative; member additional fields carry lightweight Staff User attributes, never a second role source.
+- [x] oRPC procedure factory role check helper is deny-by-default: every procedure declares allowed roles or fails closed; unauthenticated procedures (login, health) must be **explicitly marked public**.
+- [x] Tenant context middleware: treat client-provided Tenant IDs as selectors only; verify Better Auth membership server-side before any Tenant-scoped query.
+- [x] Tenant-scoped query helpers/procedure context: every PHI read/write requires Tenant context, scopes by `tenant_id`, and exposes no unscoped DB helpers to feature code.
+- [x] `audit_events` table: tenant-owned append-only events (`tenant_id`, actor user id, action, resource type/id, timestamp), queryable later by patient/actor/date; migrations run as owner role while the runtime app DB role has INSERT/SELECT only and no UPDATE/DELETE; `audit()` helper wires into the procedure factory so PHI procedures emit events without per-endpoint boilerplate; for writes, the event is inserted **in the same transaction** as the write it records; reads/searches also emit Audit Events through the same non-optional helper API without hard-coding one-event-per-row.
+- [x] PHI-safe logger wrapper over `@tsu-stack/logger`: accepts IDs/codes/metrics only; CI grep/test that fails on known PHI field names in log calls.
+- [x] Seed script: two synthetic Better Auth organizations/Tenants, one Facility each, users per role, practitioners; the seed grows with each phase.
+- [x] CI: typecheck, lint, unit tests, reusable **cross-tenant denial test harness** against Phase-0 Tenant-owned resources (Practitioner/Facility records; later phases extend it), audit-emission tests for read and write paths, PHI-log test. _(Harnesses exist and pass locally — `pnpm run test:unit:run` + pre-commit `vp staged`; a hosted CI workflow in `.github/workflows/` is not yet wired.)_
 
-**Exit gate:** synthetic `hospital_admin` selects Tenant A → creates a Practitioner or Facility record → write Audit Event exists → reads it back and read Audit Event exists → wrong-role user calling a restricted procedure is denied (proven in CI) → Tenant B cannot see it (proven in CI).
+**Exit gate — ✅ passed (Phase 0 merged; suites green):** synthetic `hospital_admin` selects Tenant A → creates a Practitioner or Facility record → write Audit Event exists → reads it back and read Audit Event exists → wrong-role user calling a restricted procedure is denied (proven in the runtime suite) → Tenant B cannot see it (proven in the runtime suite).
 
 ---
 
@@ -42,17 +44,17 @@ The repo today is a pristine tsu-stack starter (TanStack Start + Hono + oRPC + D
 
 **Checklist**
 
-- [ ] `patients` (+ `patient_identifiers` with system/value shape — the ABHA seam, empty at pilot) and phone-first lookup index.
-- [ ] Quick-register API + screen: name, phone, age/DOB, sex, optional address; target < 60s end-to-end; returning-patient search by phone with pick-or-create.
-- [ ] Duplicate warning: same phone + similar name → non-blocking prompt (no merge machinery at pilot).
-- [ ] `encounters` (status lifecycle: planned → in-progress → finished), created at check-in.
-- [ ] `tokens` + per-practitioner daily sequence; Queue statuses (waiting / in-consult / done / skipped).
-- [ ] Queue board screen (auto-refresh; usable on a TV/large display) + front-desk queue management (issue, reassign, skip).
-- [ ] Practitioner day list: today's tokens with one-tap "start consult".
-- [ ] Audit events on patient create/read/search (verify via the Phase-0 helper, don't re-implement).
-- [ ] UI speed pass with a front-desk mindset: keyboard-first entry, no dead clicks — this is the dual-run battleground ([ADR-0006](./adr/0006-coexistence-pilot-no-inventory.md)).
+- [x] `patients` (+ `patient_identifiers` with system/value shape — the ABHA seam, empty at pilot) and phone-first lookup index.
+- [x] Quick-register API + screen: name, phone, age/DOB, sex, optional address; target < 60s end-to-end; returning-patient search by phone with pick-or-create.
+- [x] Duplicate warning: same phone + similar name → non-blocking prompt (no merge machinery at pilot).
+- [x] `encounters` (status lifecycle: planned → in-progress → finished), created at check-in.
+- [x] `tokens` + per-practitioner daily sequence; Queue statuses (waiting / in-consult / done / skipped).
+- [x] Queue board screen (auto-refresh; usable on a TV/large display) + front-desk queue management (issue, reassign, skip).
+- [x] Practitioner day list: today's tokens with one-tap "start consult".
+- [x] Audit events on patient create/read/search (verify via the Phase-0 helper, don't re-implement).
+- [x] UI speed pass with a front-desk mindset: keyboard-first entry, no dead clicks — this is the dual-run battleground ([ADR-0006](./adr/0006-coexistence-pilot-no-inventory.md)).
 
-**Exit gate:** synthetic patient registered in <60s → token issued → appears on queue board and practitioner list within 3s → all touches audited.
+**Exit gate — ✅ passed (Phase 1 merged):** synthetic patient registered in <60s → token issued → appears on queue board and practitioner list within 3s → all touches audited.
 
 ---
 
@@ -62,16 +64,16 @@ The repo today is a pristine tsu-stack starter (TanStack Start + Hono + oRPC + D
 
 **Checklist**
 
-- [ ] Review consult screen + Rx print mock with the clinical advisor **before building** (paper/Figma is fine — this is the cheapest safety and adoption work in the whole plan).
-- [ ] `consult_notes`: vitals, complaints, findings, diagnosis (free text + optional code field for the future), advice/follow-up; **Preliminary → Signed** state machine (signed = immutable; correction = superseding version).
-- [ ] Prominent allergy field on Patient, always visible in the consult header ([ADR-0005](./adr/0005-defer-abdm-typed-rx-paper-equivalent.md)).
-- [ ] Note templates per specialty (2–3 launch templates defined with the advisor).
-- [ ] `formulary_items` (hospital-local: name, strength, form, default dose text) + admin CRUD; import the hospital's common-meds list.
-- [ ] `prescriptions` + `prescription_lines`: quick-pick from Formulary or free text; dose/frequency/duration fields; sign action; immutable after signing; supersede-to-correct.
-- [ ] Rx print view: advisor-approved layout, hospital letterhead, practitioner registration number, signed-only printing enforced at the API (Preliminary artifacts cannot print — the future AI seam depends on this rule existing now, [ADR-0001](./adr/0001-workflow-first-opd-pilot.md)).
-- [ ] Sign/print emit audit events.
+- [ ] Review consult screen + Rx print mock with the clinical advisor **before building** (paper/Figma is fine — this is the cheapest safety and adoption work in the whole plan). _(Not done as written: built with provisional advisor stand-ins per the [Phase 2 spec](./specs/phase-2-doctor-loop.md) gate note — the advisor review/iteration is the outstanding external step.)_
+- [x] `consult_notes`: vitals, complaints, findings, diagnosis (free text + optional code field for the future), advice/follow-up; **Preliminary → Signed** state machine (signed = immutable; correction = superseding version).
+- [x] Prominent allergy field on Patient, always visible in the consult header ([ADR-0005](./adr/0005-defer-abdm-typed-rx-paper-equivalent.md)).
+- [x] Note templates per specialty (2–3 launch templates defined with the advisor). _(feature built; 3 provisional launch templates seeded — advisor to finalize.)_
+- [x] `formulary_items` (hospital-local: name, strength, form, default dose text) + admin CRUD; import the hospital's common-meds list. _(feature + admin CRUD built; ~15 synthetic meds seeded — real common-meds import pending.)_
+- [x] `prescriptions` + `prescription_lines`: quick-pick from Formulary or free text; dose/frequency/duration fields; sign action; immutable after signing; supersede-to-correct.
+- [x] Rx print view: advisor-approved layout, hospital letterhead, practitioner registration number, signed-only printing enforced at the API (Preliminary artifacts cannot print — the future AI seam depends on this rule existing now, [ADR-0001](./adr/0001-workflow-first-opd-pilot.md)). _(signed-only printing enforced at the API **and** DB triggers; letterhead layout provisional, pending advisor approval.)_
+- [x] Sign/print emit audit events.
 
-**Exit gate:** clinical advisor walks through register → consult → sign → printed Rx on synthetic data and approves layout + flow; unsigned notes/Rx provably cannot print.
+**Exit gate — code-complete & suites green; advisor walkthrough pending (external):** register → consult → sign → printed Rx works on synthetic data, and unsigned/superseded notes/Rx provably cannot print (enforced at the API **and** DB triggers, proven in `doctor-loop-runtime.test.ts`). The clinical advisor's walkthrough and approval of layout + flow is the outstanding external step.
 
 ---
 
@@ -114,7 +116,7 @@ The repo today is a pristine tsu-stack starter (TanStack Start + Hono + oRPC + D
 - [ ] Load sanity: one day's realistic volume (registrations, tokens, invoices) on the VPS without degradation.
 - [ ] Rollback plan: tagged releases, tested `docker compose` rollback, migration down-strategy or restore-based rollback.
 
-**Exit gate (Go-live gate):** restore drill passed · deny/tenant-scope/audit/PHI-log CI suites green · advisor sign-off done · pilot agreement signed · staff trained · fallback playbook agreed · founder go/no-go recorded.
+**Exit gate (Go-live gate):** restore drill passed · deny/tenant-scope/audit/PHI-log CI suites green · advisor sign-off done · pilot agreement signed · staff trained · fallback playbook agreed · founder go/no-go recorded. _(The deny/tenant-scope/audit/PHI-log suites already exist and pass; wiring them into a hosted CI runner (`.github/workflows/`) remains outstanding Phase-4 work.)_
 
 ---
 
@@ -170,3 +172,4 @@ The long-term intent is the full PRD suite; these queue behind Phases 6–9 and 
 5. Update [CONTEXT.md](../CONTEXT.md) when a term changes; write an ADR when a decision is hard to reverse, surprising, and a real trade-off.
 6. Geography/compliance specifics (GST rates, identifier systems, terminology) live in config _tables_, not code (baseline ADR-5) — the config-pack service arrives with geography #2.
 7. PHI stays server-side: no browser-persisted caches (localStorage/IndexedDB); render from the server, keep client state in memory.
+8. Keep this file honest: when a phase's gate passes, flip its checkboxes and update its gate status **here** as part of that phase's cleanup. Stale `[ ]` boxes on shipped work (or `[x]` on unbuilt work) are a standing review finding.

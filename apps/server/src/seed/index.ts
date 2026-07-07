@@ -8,7 +8,9 @@ import { and, closeDb, db, eq } from "@tsu-stack/db";
 import {
   encounters,
   facilities,
+  formularyItems,
   member,
+  noteTemplates,
   organization,
   patients,
   practitioners,
@@ -54,6 +56,23 @@ type SeedPatient = {
   fullName: string;
   phone: string;
   sex: "male" | "female" | "other" | "unknown";
+};
+
+type SeedFormularyItem = {
+  defaultDoseText: string;
+  form: string;
+  name: string;
+  strength: string;
+};
+
+type SeedNoteTemplate = {
+  advice: string;
+  complaints: string;
+  diagnosisText: string;
+  findings: string;
+  followUp: string;
+  name: string;
+  specialty?: string;
 };
 
 type SeedTenant = {
@@ -199,6 +218,129 @@ const SEED_TENANTS: SeedTenant[] = [
         sex: "female"
       }
     ]
+  }
+];
+
+const SEED_FORMULARY_ITEMS: SeedFormularyItem[] = [
+  {
+    defaultDoseText: "1 tablet",
+    form: "tablet",
+    name: "Paracetamol",
+    strength: "500 mg"
+  },
+  {
+    defaultDoseText: "1 capsule",
+    form: "capsule",
+    name: "Amoxicillin",
+    strength: "500 mg"
+  },
+  {
+    defaultDoseText: "1 tablet",
+    form: "tablet",
+    name: "Azithromycin",
+    strength: "500 mg"
+  },
+  {
+    defaultDoseText: "1 tablet",
+    form: "tablet",
+    name: "Cetirizine",
+    strength: "10 mg"
+  },
+  {
+    defaultDoseText: "1 tablet",
+    form: "tablet",
+    name: "Pantoprazole",
+    strength: "40 mg"
+  },
+  {
+    defaultDoseText: "1 tablet",
+    form: "tablet",
+    name: "Metformin",
+    strength: "500 mg"
+  },
+  {
+    defaultDoseText: "1 tablet",
+    form: "tablet",
+    name: "Amlodipine",
+    strength: "5 mg"
+  },
+  {
+    defaultDoseText: "1 tablet",
+    form: "tablet",
+    name: "Ibuprofen",
+    strength: "400 mg"
+  },
+  {
+    defaultDoseText: "1 tablet",
+    form: "tablet",
+    name: "Domperidone",
+    strength: "10 mg"
+  },
+  {
+    defaultDoseText: "1 sachet in 1 litre water",
+    form: "sachet",
+    name: "ORS",
+    strength: ""
+  },
+  {
+    defaultDoseText: "5 ml",
+    form: "syrup",
+    name: "Cough syrup",
+    strength: "100 ml"
+  },
+  {
+    defaultDoseText: "1 tablet",
+    form: "tablet",
+    name: "Multivitamin",
+    strength: ""
+  },
+  {
+    defaultDoseText: "1 capsule weekly",
+    form: "capsule",
+    name: "Vitamin D3",
+    strength: "60000 IU"
+  },
+  {
+    defaultDoseText: "2 puffs",
+    form: "inhaler",
+    name: "Salbutamol",
+    strength: ""
+  },
+  {
+    defaultDoseText: "1 tablet",
+    form: "tablet",
+    name: "Rabeprazole",
+    strength: "20 mg"
+  }
+];
+
+const SEED_NOTE_TEMPLATES: SeedNoteTemplate[] = [
+  {
+    advice: "Hydration, rest, and warning signs explained.",
+    complaints: "Fever with cough/cold symptoms.",
+    diagnosisText: "Fever / upper respiratory infection.",
+    findings: "General condition stable; throat and chest examined.",
+    followUp: "Review in 2-3 days or earlier if symptoms worsen.",
+    name: "Fever / URI",
+    specialty: "General Medicine"
+  },
+  {
+    advice: "Oral rehydration and light diet; return for dehydration warning signs.",
+    complaints: "Loose stools and abdominal discomfort.",
+    diagnosisText: "Acute gastroenteritis.",
+    findings: "Hydration status assessed; abdomen soft.",
+    followUp: "Review in 48 hours if not improving.",
+    name: "Acute gastroenteritis",
+    specialty: "General Medicine"
+  },
+  {
+    advice: "Continue lifestyle measures and medication adherence.",
+    complaints: "Routine blood pressure follow-up.",
+    diagnosisText: "Hypertension follow-up.",
+    findings: "Blood pressure reviewed; no acute symptoms reported.",
+    followUp: "Follow up in 4 weeks with home BP readings.",
+    name: "Hypertension follow-up",
+    specialty: "General Medicine"
   }
 ];
 
@@ -459,6 +601,72 @@ async function ensureSeedToken(input: {
     return token;
   });
 }
+
+async function ensureFormularyItem(tenantId: string, seed: SeedFormularyItem) {
+  const [existing] = await db
+    .select()
+    .from(formularyItems)
+    .where(
+      and(
+        eq(formularyItems.tenantId, tenantId),
+        eq(formularyItems.name, seed.name),
+        eq(formularyItems.strength, seed.strength),
+        eq(formularyItems.form, seed.form)
+      )
+    )
+    .limit(1);
+  if (existing) {
+    return existing;
+  }
+
+  const [created] = await db
+    .insert(formularyItems)
+    .values({
+      defaultDoseText: seed.defaultDoseText,
+      form: seed.form,
+      name: seed.name,
+      strength: seed.strength,
+      tenantId
+    })
+    .returning();
+
+  if (!created) {
+    throw new Error(`Failed to create seed Formulary item ${seed.name}`);
+  }
+
+  return created;
+}
+
+async function ensureNoteTemplate(tenantId: string, seed: SeedNoteTemplate) {
+  const [existing] = await db
+    .select()
+    .from(noteTemplates)
+    .where(and(eq(noteTemplates.tenantId, tenantId), eq(noteTemplates.name, seed.name)))
+    .limit(1);
+  if (existing) {
+    return existing;
+  }
+
+  const [created] = await db
+    .insert(noteTemplates)
+    .values({
+      advice: seed.advice,
+      complaints: seed.complaints,
+      diagnosisText: seed.diagnosisText,
+      findings: seed.findings,
+      followUp: seed.followUp,
+      name: seed.name,
+      specialty: seed.specialty ?? null,
+      tenantId
+    })
+    .returning();
+
+  if (!created) {
+    throw new Error(`Failed to create seed Note Template ${seed.name}`);
+  }
+
+  return created;
+}
 async function main() {
   if (ENV_SERVER.NODE_ENV === "production" && process.env.ALLOW_PRODUCTION_SEED !== "true") {
     throw new Error("Refusing to run seed against production without ALLOW_PRODUCTION_SEED=true");
@@ -470,6 +678,8 @@ async function main() {
 
   let seededStaffCount = 0;
   let seededPatientCount = 0;
+  let seededFormularyItemCount = 0;
+  let seededNoteTemplateCount = 0;
 
   for (const seed of SEED_TENANTS) {
     const organizationRow = await ensureOrganization(seed);
@@ -514,6 +724,16 @@ async function main() {
         seededPatientCount += 1;
       }
     }
+
+    for (const itemSeed of SEED_FORMULARY_ITEMS) {
+      await ensureFormularyItem(organizationRow.id, itemSeed);
+      seededFormularyItemCount += 1;
+    }
+
+    for (const templateSeed of SEED_NOTE_TEMPLATES) {
+      await ensureNoteTemplate(organizationRow.id, templateSeed);
+      seededNoteTemplateCount += 1;
+    }
   }
 
   const adminEmails = SEED_TENANTS.flatMap((seed) =>
@@ -521,8 +741,9 @@ async function main() {
   ).join(", ");
 
   process.stdout.write(
-    `Seeded ${SEED_TENANTS.length} Tenants with ${seededStaffCount} staff users ` +
-      `and ${seededPatientCount} front-desk patients. ` +
+    `Seeded ${SEED_TENANTS.length} Tenants with ${seededStaffCount} staff users, ` +
+      `${seededPatientCount} front-desk patients, ${seededFormularyItemCount} Formulary items, ` +
+      `and ${seededNoteTemplateCount} Note Templates. ` +
       "Seed password source: SEED_PASSWORD environment variable. " +
       `Hospital admin users: ${adminEmails}.\n`
   );

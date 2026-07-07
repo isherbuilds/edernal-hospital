@@ -13,8 +13,10 @@ import {
   PatientOutputSchema,
   PatientQuickRegisterInputSchema,
   PatientSearchInputSchema,
+  PatientUpdateAllergiesInputSchema,
   quickRegisterPatient,
-  searchPatientsByPhone
+  searchPatientsByPhone,
+  updatePatientAllergies
 } from "./queries";
 
 const patientReaderRoles = [
@@ -64,6 +66,17 @@ export const patientRouter = {
     .output(PatientOutputSchema)
     .handler(({ context, input }) =>
       withTenantTx(context, "patient.quickRegister", (scope) => quickRegisterPatient(scope, input))
+    ),
+  updateAllergies: tenantProcedure(PatientUpdateAllergiesInputSchema, patientReaderRoles)
+    .route({
+      description: "Update a Patient's allergy note in the requested Tenant",
+      method: "POST"
+    })
+    .output(PatientOutputSchema)
+    .handler(({ context, input }) =>
+      withTenantTx(context, "patient.updateAllergies", (scope) =>
+        updatePatientAllergies(scope, input)
+      )
     ),
   searchByPhone: tenantProcedure(PatientSearchInputSchema, patientReaderRoles)
     .route({

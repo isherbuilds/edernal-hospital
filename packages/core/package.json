@@ -11,8 +11,10 @@
     "./assets": "./src/assets/index.ts",
     "./patient": "./src/patient/index.ts",
     "./auth": "./src/auth/index.ts",
+    "./clinical": "./src/clinical/index.ts",
     "./health": "./src/health/index.ts",
     "./phi": "./src/phi/index.ts",
+    "./tenancy": "./src/tenancy/index.ts",
     "./*": "./src/*.ts"
   },
   "scripts": {

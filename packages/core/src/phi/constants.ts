@@ -30,6 +30,17 @@ export const PHI_FIELD_BANLIST = [
   "clinicalNote",
   "clinicalText",
   "prescription",
+  "complaints",
+  "findings",
+  "diagnosisText",
+  "diagnosis_text",
+  "advice",
+  "followUp",
+  "follow_up",
+  "medicationText",
+  "medication_text",
+  "medicationName",
+  "medication_name",
   "labResult",
   "paymentDetails"
 ] as const;

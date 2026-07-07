@@ -44,6 +44,10 @@ _Avoid_: waitlist, line
 The Practitioner's clinical record for an Encounter (complaints, findings, diagnosis, advice). Written via template or free text at pilot; AI-drafted later.
 _Avoid_: SOAP note (aspirational structure, not a data term yet), composition
 
+**Note Template**:
+A reusable, specialty-scoped set of default Consult Note content a Practitioner applies to prefill empty fields; maintained by hospital*admin. Not a clinical artifact itself — it only seeds a Preliminary Consult Note.
+\_Avoid*: form, macro
+
 **Prescription**:
 The list of medications the Practitioner prescribes in an Encounter, composed from the Formulary or free text, signed, then printed. Signed Prescriptions are immutable; corrections create a superseding Prescription.
 _Avoid_: Rx (in code), e-Rx (implies digital transmission — pilot only prints)

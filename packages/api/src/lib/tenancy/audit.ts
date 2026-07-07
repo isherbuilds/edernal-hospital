@@ -1,7 +1,7 @@
 import { type AuditAction, type AuditDetails, type AuditResourceType } from "@tsu-stack/core/audit";
 import { PHI_FIELD_BANLIST } from "@tsu-stack/core/phi";
 
-type AuditWriteAction = Extract<AuditAction, "create" | "update" | "delete">;
+type AuditWriteAction = Extract<AuditAction, "create" | "update" | "delete" | "sign">;
 
 type AuditInput = {
   action: AuditAction;
@@ -21,6 +21,7 @@ type AuditRecord = Required<
   Pick<AuditInput, "requestId">;
 
 export type TenantAudit = {
+  print: (input: Omit<AuditInput, "action">) => Promise<void>;
   read: (input: AuditReadInput) => Promise<void>;
   search: (input: AuditReadInput) => Promise<void>;
   write: (input: Omit<AuditInput, "action"> & { action: AuditWriteAction }) => Promise<void>;
@@ -73,6 +74,7 @@ export function createTenantAudit({ insert, procedure }: CreateTenantAuditOption
   return {
     read: (input) => recordRead("read", input),
     search: (input) => recordRead("search", input),
+    print: (input) => record({ ...input, action: "print" }),
     write: (input) => record(input)
   };
 }

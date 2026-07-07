@@ -4,9 +4,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { orpc } from "@tsu-stack/api/client/tanstack-start/orpc";
-import { type PatientOutput, PatientSexSchema } from "@tsu-stack/api/routers/patient/queries";
+import { type PatientOutput } from "@tsu-stack/api/routers/patient/queries";
 import { type QueueTokenOutput } from "@tsu-stack/api/routers/queue/queries";
 import { authClient } from "@tsu-stack/auth/react/auth-client";
+import { PATIENT_SEX_OPTIONS } from "@tsu-stack/core/patient";
+import { Link } from "@tsu-stack/i18n/tanstack-start/components/link";
+import { useNavigate } from "@tsu-stack/i18n/tanstack-start/hooks/use-navigate";
 import { Button } from "@tsu-stack/ui/components/button";
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@tsu-stack/ui/components/empty";
 import {
@@ -30,6 +33,7 @@ type RegistrationDuplicatePrompt = {
 
 type RegistrationForm = {
   addressLine1: string;
+  allergies: string;
   ageYears: string;
   dateOfBirth: string;
   fullName: string;
@@ -38,8 +42,6 @@ type RegistrationForm = {
 };
 
 type QueueManagerStatus = Extract<QueueTokenOutput["status"], "done" | "skipped" | "waiting">;
-
-const PATIENT_SEX_OPTIONS = PatientSexSchema.options;
 
 function getPhoneDigits(value: string) {
   let digits = "";
@@ -86,7 +88,9 @@ export function FrontDeskPage() {
   const [phoneSearch, setPhoneSearch] = useState("");
   const phoneSearchRef = useRef<HTMLInputElement>(null);
   const [selectedPatient, setSelectedPatient] = useState<PatientOutput | null>(null);
+  const navigate = useNavigate();
   const [registration, setRegistration] = useState<RegistrationForm>({
+    allergies: "",
     addressLine1: "",
     ageYears: "",
     dateOfBirth: "",
@@ -231,6 +235,7 @@ export function FrontDeskPage() {
     const ageInput = registration.ageYears.trim();
     const dateOfBirth = registration.dateOfBirth.trim();
     const addressLine1 = registration.addressLine1.trim();
+    const allergies = registration.allergies.trim();
     const ageYears = ageInput.length > 0 ? Number(ageInput) : null;
     if (ageYears != null && (!Number.isInteger(ageYears) || ageYears < 0 || ageYears > 130)) {
       setRegistrationError("Age must be a whole number between 0 and 130.");
@@ -262,6 +267,7 @@ export function FrontDeskPage() {
       setRegisterAnywayPhoneDigits(null);
       const patient = await quickRegister.mutateAsync({
         ...(addressLine1.length > 0 ? { address: { line1: addressLine1 } } : {}),
+        ...(allergies.length > 0 ? { allergies } : {}),
         ...(ageYears != null ? { ageYears } : {}),
         ...(dateOfBirth.length > 0 ? { dateOfBirth } : {}),
         fullName: registration.fullName,
@@ -343,8 +349,11 @@ export function FrontDeskPage() {
       return;
     }
     try {
-      await startConsult.mutateAsync({ tenantId, tokenId });
-      await refreshQueueViews();
+      const token = await startConsult.mutateAsync({ tenantId, tokenId });
+      await navigate({
+        params: { encounterId: token.encounterId },
+        to: "/consult/$encounterId"
+      });
     } catch (error) {
       toast.error(getErrorMessage(error, "Failed to start consult."));
     }
@@ -561,6 +570,23 @@ export function FrontDeskPage() {
                       }}
                       placeholder="Address line"
                     />
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="patient-allergies">Known allergies (optional)</FieldLabel>
+                    <Input
+                      id="patient-allergies"
+                      value={registration.allergies}
+                      onChange={(event) => {
+                        const value = event.currentTarget.value;
+                        setRegistration((current) => {
+                          return { ...current, allergies: value };
+                        });
+                      }}
+                      placeholder="No known allergies"
+                    />
+                    <FieldDescription>
+                      Capture reported medication, food, or environmental allergies if known.
+                    </FieldDescription>
                   </Field>
                   {registrationError ? (
                     <p className="text-sm text-destructive" role="alert">
@@ -797,13 +823,22 @@ export function FrontDeskPage() {
                   </p>
                   <p className="text-sm text-muted-foreground">{token.status}</p>
                 </div>
-                {canStartConsult ? (
+                {canStartConsult && token.status === "in_consult" ? (
                   <Button
-                    type="button"
+                    nativeButton={false}
+                    render={
+                      <Link
+                        params={{ encounterId: token.encounterId }}
+                        to="/consult/$encounterId"
+                      />
+                    }
                     size="sm"
-                    disabled={token.status !== "waiting"}
-                    onClick={() => startConsultToken(token.id)}
                   >
+                    Open consult
+                  </Button>
+                ) : null}
+                {canStartConsult && token.status === "waiting" ? (
+                  <Button type="button" size="sm" onClick={() => startConsultToken(token.id)}>
                     Start consult
                   </Button>
                 ) : null}
@@ -852,6 +887,17 @@ function QueueColumn({
             {canStartConsult && token.status === "waiting" ? (
               <Button type="button" size="sm" onClick={() => onStart(token.id)}>
                 Start
+              </Button>
+            ) : null}
+            {canStartConsult && token.status === "in_consult" ? (
+              <Button
+                nativeButton={false}
+                render={
+                  <Link params={{ encounterId: token.encounterId }} to="/consult/$encounterId" />
+                }
+                size="sm"
+              >
+                Open consult
               </Button>
             ) : null}
             {canManageQueue && token.status === "in_consult" ? (

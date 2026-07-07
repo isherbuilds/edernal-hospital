@@ -38,5 +38,5 @@ The old `plans/` folder (baseline PRD/ADRs 1–8, system design, MVP pack, compl
 - **The promise to the hospital:** a product that beats their current software on _feel and administrator experience_. UX speed and polish are pilot success criteria, not nice-to-haves.
 - Hospital keeps its existing software for inventory/stock; staff dual-run both systems during the pilot.
 - Long-term intent is the full [VISION.md](./VISION.md) suite ("add everything") — the roadmap sequences it; the cutline decides _when_, not _whether_.
-- Repo is a tsu-stack starter (TanStack Start + Hono + oRPC + Drizzle + Better Auth + Coolify); no HMS code exists yet.
+- Repo is built on the tsu-stack base (TanStack Start + Hono + oRPC + Drizzle + Better Auth + Coolify); Phases 0–2 of the pilot — tenancy/roles/audit foundation, the front-desk loop, and the doctor loop — are built (see [ROADMAP.md](./ROADMAP.md)).
 - Product name undecided — "HMS" is a neutral placeholder throughout ("Arogya OS" in the vision doc).
