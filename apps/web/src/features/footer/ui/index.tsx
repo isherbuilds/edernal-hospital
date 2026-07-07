@@ -43,7 +43,7 @@ export function Footer({
   className?: string;
 }) {
   return (
-    <footer className={cn("border-t", className)} {...props}>
+    <footer className={cn("border-t print:hidden", className)} {...props}>
       <div className="container mx-auto flex flex-col gap-6 px-4 py-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

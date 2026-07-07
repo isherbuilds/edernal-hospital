@@ -16,6 +16,13 @@ describe("audit contract", () => {
     );
   });
 
+  it("includes doctor-loop audit registry members", () => {
+    expect(AUDIT_ACTIONS).toContain("sign");
+    expect(AUDIT_RESOURCE_TYPES).toEqual(
+      expect.arrayContaining(["consult_note", "prescription", "formulary_item", "note_template"])
+    );
+  });
+
   it("accepts transport-safe audit details", () => {
     const parsed = AuditEventSchema.parse({
       action: "create",

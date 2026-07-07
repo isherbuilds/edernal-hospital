@@ -104,6 +104,8 @@ minimumReleaseAgeExclude:
 overrides:
   vite: "catalog:"
   drizzle-orm: "catalog:"
+  "@dotenvx/dotenvx>undici": ">=7.28.0"
+  srvx: ">=0.11.13"
 peerDependencyRules:
   allowAny:
     - vite

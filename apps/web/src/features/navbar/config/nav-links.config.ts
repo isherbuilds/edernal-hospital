@@ -20,6 +20,14 @@ export const navLinks: NavbarLink[] = [
     to: "/front-desk"
   },
   {
+    label: () => m.navbar__formulary(),
+    to: "/admin/formulary"
+  },
+  {
+    label: () => m.navbar__note_templates(),
+    to: "/admin/note-templates"
+  },
+  {
     href: `${ENV_WEB_ISOMORPHIC.VITE_SERVER_URL}/docs`,
     label: () => m.navbar__api_docs()
   }

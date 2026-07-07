@@ -1,4 +1,4 @@
-import { createORPCClient } from "@orpc/client";
+import { createORPCClient, isDefinedError, ORPCError } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
 import { createRouterClient, type RouterClient } from "@orpc/server";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
@@ -41,3 +41,5 @@ const getORPCClient = createIsomorphicFn()
 export const client = getORPCClient();
 
 export const orpc = createTanstackQueryUtils(client);
+
+export { isDefinedError, ORPCError };

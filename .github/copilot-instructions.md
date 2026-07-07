@@ -22,10 +22,12 @@ apps/server   - Hono API server (port 5000, path /server)
 apps/web      - TanStack Start web app (port 3000, path /web)
 packages/api  - oRPC routers & client where all the API logic lives with OpenAPI metadata
 packages/auth - Better Auth config
+packages/core - Shared domain contracts (roles, audit, clinical, PHI, patient schemas) used across packages
 packages/db   - Drizzle schemas & migrations, run `vp run -w db:*` to manage the database
 packages/env  - Shared env validation (.env lives here)
 packages/i18n - Paraglide i18n + Vite plugin
 packages/logger - Logtape isomorphic logger (client + server) with designated categories
+packages/seo  - SEO/meta helpers for TanStack Start routes
 packages/ui   - shadcn/ui components shared across all apps/*
 tools/tsconfig - Shared TypeScript base config
 ```
@@ -38,7 +40,8 @@ tools/tsconfig - Shared TypeScript base config
 | ------------------------ | -------------------------------------------------------- |
 | `vp run dev`             | Start all dev servers concurrently                       |
 | `vp run fix`             | Format, lint, and type-check (auto-runs on `git commit`) |
-| `vp run test`            | Run all tests                                            |
+| `vp run test:unit:run`   | Run all unit tests                                       |
+| `vp run test:e2e:run`    | Run all e2e tests                                        |
 | `vp run build`           | Build all packages                                       |
 | `vp run db:dev:start`    | Start local PostgreSQL (Docker)                          |
 | `vp run db:dev:stop`     | Stop local PostgreSQL                                    |

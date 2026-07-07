@@ -1,0 +1,9 @@
+export const TENANT_RESOURCE_STATUS = {
+  ACTIVE: "active",
+  INACTIVE: "inactive"
+} as const;
+
+export const TENANT_RESOURCE_STATUSES = [
+  TENANT_RESOURCE_STATUS.ACTIVE,
+  TENANT_RESOURCE_STATUS.INACTIVE
+] as const;

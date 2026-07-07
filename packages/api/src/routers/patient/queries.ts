@@ -28,9 +28,12 @@ const PatientDateOfBirthSchema = z.iso
     message: "Date of birth cannot be in the future."
   });
 
+const PatientAllergiesInputSchema = z.string().trim().max(2000);
+
 const PatientDemographicsInputSchema = {
   address: PatientAddressSchema.optional(),
   ageYears: z.number().int().min(0).max(130).optional(),
+  allergies: PatientAllergiesInputSchema.default(""),
   dateOfBirth: PatientDateOfBirthSchema.optional(),
   fullName: z.string().trim().min(1).max(200),
   phone: z.string().trim().min(6).max(32),
@@ -50,6 +53,11 @@ export const PatientQuickRegisterInputSchema = TenantScopeInputSchema.extend(
 });
 
 export type PatientQuickRegisterInput = z.infer<typeof PatientQuickRegisterInputSchema>;
+
+export const PatientUpdateAllergiesInputSchema = TenantScopeInputSchema.extend({
+  allergies: PatientAllergiesInputSchema,
+  patientId: z.uuid()
+});
 
 export const PatientByIdInputSchema = TenantScopeInputSchema.extend({
   id: z.uuid()
@@ -72,6 +80,7 @@ export const DuplicatePatientWarningSchema = z.object({
 
 export const PatientOutputSchema = z.object({
   address: PatientAddressSchema,
+  allergies: z.string(),
   ageYears: z.number().int().nullable(),
   createdAt: z.iso.datetime(),
   dateOfBirth: z.iso.date().nullable(),
@@ -127,13 +136,14 @@ function namesLookSimilar(first: string, second: string): boolean {
   return firstTokenA.length >= 3 && firstTokenA === firstTokenB;
 }
 
-function toPatientOutput(
+export function toPatientOutput(
   row: PatientRow,
   identifiers: PatientIdentifierRow[] = [],
   duplicateWarnings: z.infer<typeof DuplicatePatientWarningSchema>[] = []
 ): PatientOutput {
   return PatientOutputSchema.parse({
     address: row.address,
+    allergies: row.allergies,
     ageYears: row.ageYears,
     createdAt: row.createdAt.toISOString(),
     dateOfBirth: row.dateOfBirth,
@@ -199,6 +209,7 @@ export async function quickRegisterPatient(scope: TenantTxScope, input: PatientQ
     .insert(patients)
     .values({
       address: input.address ?? {},
+      allergies: input.allergies,
       ageYears: input.ageYears ?? null,
       dateOfBirth: input.dateOfBirth ?? null,
       fullName: input.fullName,
@@ -224,6 +235,38 @@ export async function quickRegisterPatient(scope: TenantTxScope, input: PatientQ
   });
 
   return toPatientOutput(patient, [], duplicateWarnings);
+}
+
+export async function updatePatientAllergies(
+  scope: TenantTxScope,
+  input: z.infer<typeof PatientUpdateAllergiesInputSchema>
+) {
+  const [patient] = await scope.tx
+    .update(patients)
+    .set({
+      allergies: input.allergies
+    })
+    .where(and(eq(patients.tenantId, scope.tenantId), eq(patients.id, input.patientId)))
+    .returning();
+
+  if (!patient) {
+    throw new ORPCError("NOT_FOUND", {
+      message: "Patient not found in the requested Tenant.",
+      status: 404
+    });
+  }
+
+  await scope.audit.write({
+    action: "update",
+    details: {
+      field: "allergies"
+    },
+    resourceId: patient.id,
+    resourceType: "patient"
+  });
+
+  const identifiers = await getPatientIdentifiers(scope, patient.id);
+  return toPatientOutput(patient, identifiers);
 }
 
 export async function searchPatientsByPhone(scope: TenantTxScope, phone: string) {

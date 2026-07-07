@@ -8,7 +8,9 @@ import { ENV_SERVER } from "@tsu-stack/env/server/env";
 import { databaseRelations } from "#@/schema/index";
 
 export * from "drizzle-orm/sql";
-export { and, asc, desc, eq, ilike, inArray, ne, or } from "drizzle-orm";
+export { and, asc, desc, eq, ilike, inArray, isNull, ne, or } from "drizzle-orm";
+export type { AnyPgColumn, PgTable } from "drizzle-orm/pg-core";
+export type { InferInsertModel, InferSelectModel } from "drizzle-orm";
 
 const client = postgres(ENV_SERVER.DATABASE_URL);
 
