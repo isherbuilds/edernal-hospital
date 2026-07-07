@@ -1,29 +1,19 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 
 import { orpc } from "@tsu-stack/api/client/tanstack-start/orpc";
 import { type PrescriptionOutput } from "@tsu-stack/api/routers/consult/queries";
 
-import { consultWorkspaceQueryKeys } from "./get-consult-workspace.query";
+import { useInvalidateConsultWorkspace } from "./get-consult-workspace.query";
 
 export type SupersedePrescriptionMutationResult = PrescriptionOutput;
 
-export function supersedePrescriptionMutationOptions() {
-  return orpc.consult.supersedePrescription.mutationOptions();
-}
-
 export function useSupersedePrescriptionMutation() {
-  const queryClient = useQueryClient();
+  const invalidateWorkspace = useInvalidateConsultWorkspace();
 
   return useMutation(
     orpc.consult.supersedePrescription.mutationOptions({
-      onSuccess: async (prescription, variables) => {
-        await queryClient.invalidateQueries({
-          queryKey: consultWorkspaceQueryKeys.byEncounter(
-            variables.tenantId,
-            prescription.encounterId
-          )
-        });
-      }
+      onSuccess: (prescription, variables) =>
+        invalidateWorkspace(variables.tenantId, prescription.encounterId)
     })
   );
 }

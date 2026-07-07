@@ -7,10 +7,6 @@ import { getErrorMessage } from "@/shared/lib/get-error-message";
 
 import { formularyItemsQueryKeys } from "./list-formulary-items.query";
 
-export function updateFormularyItemMutationOptions() {
-  return orpc.formulary.update.mutationOptions();
-}
-
 export function useUpdateFormularyItemMutation(tenantId: string) {
   const queryClient = useQueryClient();
 

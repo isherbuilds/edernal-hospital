@@ -1,8 +1,6 @@
 import { z } from "zod";
 
 import { type ConsultNoteOutput } from "@tsu-stack/api/routers/consult/queries";
-
-export { getErrorMessage } from "@/shared/lib/get-error-message";
 import {
   ConsultNoteVitalsSchema,
   NOTE_TEXT_LIMIT,

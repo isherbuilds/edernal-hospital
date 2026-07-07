@@ -1,12 +1,12 @@
 import { Card, CardContent } from "@tsu-stack/ui/components/card";
 
+import { getErrorMessage } from "@/shared/lib/get-error-message";
 import { useTenantGate } from "@/shared/lib/use-tenant-gate";
 import { Container } from "@/shared/ui/container";
 import { TenantGateCard } from "@/shared/ui/tenant-gate-card";
 
 import { useGetConsultWorkspaceQuery } from "@/features/consult/api/get-consult-workspace.query";
 import { useListNoteTemplatesQuery } from "@/features/consult/api/list-note-templates.query";
-import { getErrorMessage } from "@/features/consult/ui/consult-form.helpers";
 import { EmptyState, LoadingState } from "@/features/consult/ui/consult-ui";
 import { NotePane } from "@/features/consult/ui/note-pane";
 import { HeaderCard } from "@/features/consult/ui/patient-header-card";

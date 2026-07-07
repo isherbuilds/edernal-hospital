@@ -13,12 +13,12 @@ import {
   TableRow
 } from "@tsu-stack/ui/components/table";
 
+import { getErrorMessage } from "@/shared/lib/get-error-message";
 import { useTenantGate } from "@/shared/lib/use-tenant-gate";
 import { Container } from "@/shared/ui/container";
 import { TenantGateCard } from "@/shared/ui/tenant-gate-card";
 
 import { useGetPrescriptionPrintQuery } from "@/features/consult/api/get-prescription-print.query";
-import { getErrorMessage } from "@/features/consult/ui/consult-form.helpers";
 
 export function PrescriptionPrintPage({ prescriptionId }: { prescriptionId?: string }) {
   const {
